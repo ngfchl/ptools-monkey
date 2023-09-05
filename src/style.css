@@ -1,0 +1,17 @@
+#app {
+  padding: 2rem;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  width: 100px;
+  margin-right: 0;
+  margin-left: 0;
+
+  margin-top: 240px;
+  float: left;
+  opacity: 0.8;
+  font-size: 12px;
+  background-color: #fff;
+}
+
