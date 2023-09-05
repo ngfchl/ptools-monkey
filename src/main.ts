@@ -1,12 +1,12 @@
-import { createApp } from 'vue';
+import {createApp} from 'vue';
 import './style.css';
 import 'ant-design-vue/dist/reset.css';
 import App from './App.vue';
 
 createApp(App).mount(
-  (() => {
-    const app = document.createElement('div');
-    document.body.append(app);
-    return app;
-  })(),
+    (() => {
+        const element_ptools = document.createElement('div');
+        document.body.append(element_ptools);
+        return element_ptools;
+    })(),
 );

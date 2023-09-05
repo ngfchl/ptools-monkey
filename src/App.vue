@@ -8,6 +8,9 @@ import {
   DownloadOutlined
 } from '@ant-design/icons-vue'
 
+const api = ref('http://127.0.0.1:8080/')
+const token = ref('ptools')
+
 interface Torrent {
   tid: string
   title: string
@@ -46,10 +49,10 @@ export interface Category {
   savePath: string
 }
 
-const [messageApi, contextHolder] = message.useMessage();
+message.config({
+  top: `50px`,
+});
 const activeKey = ref<number[]>([]);
-const api = ref('http://127.0.0.1:8080/')
-const token = ref('ptools')
 const downloaders = ref<Downloader[]>([])
 const user_detail_page = ref(false)
 const torrent_list_page = ref(false)
@@ -62,7 +65,11 @@ const modal_title = ref<string>('下载到')
 
 const showModal = () => {
   if (downloaders.value.length <= 0) {
-    messageApi.warning('没有可用的下载器！请现在ptools中添加！')
+    message.warning('没有可用的下载器！请现在ptools中添加！')
+    return
+  }
+  if (torrents.value.length <= 0) {
+    message.warning('没有符合条件的种子！')
     return
   }
   open.value = true;
@@ -89,12 +96,23 @@ async function init_button() {
     console.log('当前为种子列表页')
     torrent_list_page.value = true
   }
-  if (location.pathname.startsWith('/userdetails.php')) {
+  if (location.pathname.startsWith('/userdetails') ||
+      location.href.includes('/user.php?id=') ||
+      location.href.includes('/user.php?u=') ||
+      location.href.includes('/index.php?page=usercp&uid=') ||
+      location.href.includes('/Users/profile?uid=') ||
+      location.href.includes('/profile/') ||
+      location.href.includes('/users/')
+  ) {
     console.log('当前为个人信息页')
     user_detail_page.value = true
     await sync_cookie()
   }
-  if (location.pathname.search(/usercp.php/) > 0) {
+  if (location.pathname.search(/usercp.php/) > 0 ||
+      location.href.includes('/index.php?page=usercp&do=pid_c&action=change&uid=') ||
+      location.href.includes('/Users/me') ||
+      location.href.includes('/my.php')
+  ) {
     console.log('当前为控制面板页')
     user_detail_page.value = true
     await sync_cookie()
@@ -136,7 +154,7 @@ async function getSite() {
  */
 async function getCookie() {
   return new Promise(async (resolve, reject) => {
-    await GM_cookie('list', { // 异步,如果在return data之前还没执行完，部分站点会导致cookie不全。
+    await GM_cookie.list({ // 异步,如果在return data之前还没执行完，部分站点会导致cookie不全。
       url: location.href
     }, (cookies: { name: string, value: string }[]) => {
       try {
@@ -158,7 +176,7 @@ async function getSiteData() {
   let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
   console.log(site_info)
   if (site_info === false) {
-    alert('ptools服务器连接失败！')
+    message.error('ptools服务器连接失败！')
     return false;
   }
   console.log(site_info.my_uid_rule)
@@ -166,7 +184,7 @@ async function getSiteData() {
   let user_agent = window.navigator.userAgent
   let cookie = await getCookie()
   if (!cookie) {
-    alert('Cookie获取失败，请使用Beta版油猴（红色图标的油猴）！')
+    message.error('Cookie获取失败，请使用Beta版油猴（红色图标的油猴）！')
     return false
   }
   //获取UID
@@ -180,7 +198,7 @@ async function getSiteData() {
   let user_id = user_id_info[user_id_info.length - 1].trim()
   console.log(user_id)
   if (!user_id) {
-    alert('用户ID获取失败！')
+    message.error('用户ID获取失败！')
     return false
   }
   let data = `user_id=${user_id}&nickname=${site_info.name}&site=${site_info.id}&cookie=${cookie}&user_agent=${user_agent}`
@@ -219,6 +237,9 @@ const getTimeJoin = () => {
     let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
     let time_join = document.evaluate(site_info.my_time_join_rule, document).iterateNext()!.textContent
     return time_join!.trim()
+        .replace('T', ' ')
+        .replace('+08:00', '')
+        .match(/\d{4}\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/)![0]
   } catch (e) {
     console.error(e)
     return false
@@ -257,7 +278,7 @@ async function send_site_info(data: string) {
         }
         console.log('站点信息获取成功！', res.msg)
         console.log(res)
-        alert('PTools提醒您：' + res.msg)
+        message.success('PTools提醒您：' + res.msg)
         resolve(res)
       }, onerror: function () {
         reject("站点信息获取失败")
@@ -420,9 +441,9 @@ const test_connect = async (downloader_id: number) => {
       let res = response.response
       console.log(res)
       if (res.code !== 0) {
-        messageApi.error(res.msg)
+        message.error(res.msg)
       } else {
-        messageApi.success(res.msg)
+        message.success(res.msg)
       }
     }
   })
@@ -444,7 +465,7 @@ async function getDownloaderCategorise(downloader_id: number) {
       let res = response.response
       console.log(res)
       if (!res || res.code !== 0) {
-        messageApi.error(res.msg)
+        message.error(res.msg)
       } else {
         categories.value = res.data
       }
@@ -484,13 +505,13 @@ const push_torrent = async (downloader_id: number, category: string) => {
   await generate_magnet_url(true)
   console.log(url_list.value)
   let data = `site=${site_info.id}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join('|')}`
-  // messageApi.warning(data)
+  // message.warning(data)
   GM_xmlhttpRequest({
     url: `${api.value}api/mysite/push_torrent?${data}`, method: "GET", responseType: "json", headers: {
       Authorization: token.value
     }
   })
-  messageApi.success('种子已推送，请检查下载器！')
+  message.success('种子已推送，请检查下载器！')
   open.value = false
 }
 
@@ -516,17 +537,17 @@ async function download_free() {
   showModal()
 }
 
-async function copy_all() {
-  messageApi.info('copy_all！', 2)
-}
+// async function copy_all() {
+//   message.info('copy_all！', 2)
+// }
 
-async function copy_free() {
-  messageApi.info('copy_free！', 2)
-}
+// async function copy_free() {
+//   message.info('copy_free！', 2)
+// }
 
-async function copy_link() {
-  messageApi.info('copy_all！', 2)
-}
+// async function copy_link() {
+//   message.info('copy_all！', 2)
+// }
 
 const init = ref(0)
 onBeforeMount(async () => {
@@ -552,19 +573,22 @@ onBeforeMount(async () => {
     <a-image
         :preview="false"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
-        :fallback="`${api}/ptools.svg`"
+        :fallback="`${api}ptools.svg`"
         class="image"/>
     <a-space
         align="center"
         style="width: 100%;"
     >
       <a-space-compact direction="vertical">
-        <a-tag
-            color="orange"
-            :bordered="false"
-            style="width: 100%; font-size: 14px;text-align: center;"
-        >PTools
-        </a-tag>
+        <a-button danger ghost block style="width: 110px;">
+          <template #icon>
+            <a-image
+                :width="16"
+                style="margin-top: -3px;padding-right: 1px;"
+                :src="`${api}ptools.svg`"/>
+          </template>
+          PTools
+        </a-button>
         <a-button
             size="small" block type="primary"
             @click="sync_cookie"
@@ -650,13 +674,16 @@ onBeforeMount(async () => {
           expand-icon-position="end"
           :bordered="false"
           @change="getDownloaderCategorise">
-        <a-collapse-panel v-for="d in downloaders" :key="d.id">
-          <template #header>
-            <a-image
-                :width="16"
-                style="margin-top: -3px;padding-right: 1px;"
-                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>
-            {{ d.name }}
+        <a-collapse-panel v-for="d in downloaders" :key="d.id" style="font-size: 16px;">
+          <template #header >
+            <a-avatar :size="18">
+              {{d.category}}
+            </a-avatar>
+<!--            <a-image-->
+<!--                :width="16"-->
+<!--                style="margin-top: -3px;padding-right: 1px;"-->
+<!--                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>-->
+            <span style="margin-left: 3px;">{{ d.name }}</span>
           </template>
           <a-space wrap align="center">
             <a-button
@@ -687,7 +714,7 @@ onBeforeMount(async () => {
 .wrap {
   position: fixed;
   top: 0;
-  z-index: 9999;
+  z-index: 99999;
   width: 110px;
   margin-right: 0;
   margin-left: 0;
