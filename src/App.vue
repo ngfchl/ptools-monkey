@@ -2,14 +2,18 @@
 import {onBeforeMount, ref} from "vue";
 import {GM_cookie, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
 import {message} from "ant-design-vue"
-import {ArrowDownOutlined, CopyFilled, DownloadOutlined, DownSquareFilled,} from '@ant-design/icons-vue'
+import {
+  ArrowDownOutlined,
+  SyncOutlined,
+  DownloadOutlined
+} from '@ant-design/icons-vue'
 
 interface Torrent {
-  tid: number
+  tid: string
   title: string
   category: string
-  completers?: number
-  leechers?: number
+  completers?: string
+  leechers?: string
   hr: string
   magnet_url: string
   poster: string
@@ -55,6 +59,7 @@ const categories = ref<Category[]>([])
 const cookie = ref<string>('')
 const url_list = ref<string[]>([])
 const modal_title = ref<string>('下载到')
+
 const showModal = () => {
   if (downloaders.value.length <= 0) {
     messageApi.warning('没有可用的下载器！请现在ptools中添加！')
@@ -115,7 +120,7 @@ async function getSite() {
         sessionStorage.setItem('ptools', JSON.stringify(res))
         resolve(res)
       },
-      onerror: function (response) {
+      onerror: function () {
         console.log('服务器连接失败！')
         reject(false)
       }
@@ -214,7 +219,7 @@ async function send_site_info(data: string) {
         console.log(res)
         alert('PTools提醒您：' + res.msg)
         resolve(res)
-      }, onerror: function (response) {
+      }, onerror: function () {
         reject("站点信息获取失败")
       }
     })
@@ -298,6 +303,7 @@ async function get_torrent_list() {
  * 抓取种子详情页
  */
 async function get_torrent_detail() {
+  torrents.value.length = 0
   let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
   let tid = null
   let title = xpath(site_info.detail_title_rule, document).snapshotItem(0)
@@ -323,7 +329,7 @@ async function get_torrent_detail() {
   for (let i = 0; i < tags.snapshotLength; i++) {
     tag.push(tags.snapshotItem(i)!.textContent!.trim())
   }
-  return {
+  let torrent = {
     tid: tid,
     title: title ? title.textContent!.trim() : '',
     subtitle: subtitle ? subtitle.textContent!.trim() : '',
@@ -340,6 +346,7 @@ async function get_torrent_detail() {
     tags: tags.snapshotLength > 0 ? tag.join() : '',
     imdb_url: imdb ? imdb.textContent!.trim() : '',
   }
+  torrents.value.push(torrent)
 }
 
 /**
@@ -365,7 +372,7 @@ async function getDownloaders() {
 /**
  * 测试下载器
  */
-const test_connect = (downloader_id: number) => {
+const test_connect = async (downloader_id: number) => {
   GM_xmlhttpRequest({
     url: `${api.value}api/download/downloader/test?downloader_id=${downloader_id}`, method: "GET", responseType: "json", headers: {
       Authorization: token.value
@@ -385,11 +392,11 @@ const test_connect = (downloader_id: number) => {
  * 获取下载器分类列表
  */
 async function getDownloaderCategorise(downloader_id: number) {
-  console.log(downloader_id)
   categories.value.length = 0
   if (!downloader_id) {
     return
   }
+  await test_connect(downloader_id)
   GM_xmlhttpRequest({
     url: `${api.value}api/download/downloaders/categories?downloader_id=${downloader_id}`, method: "GET", responseType: "json", headers: {
       Authorization: token.value
@@ -399,7 +406,6 @@ async function getDownloaderCategorise(downloader_id: number) {
       if (!res || res.code !== 0) {
         messageApi.error(res.msg)
       } else {
-        messageApi.success('下载器分类获取成功！', res)
         categories.value = res.data
       }
     }
@@ -411,7 +417,6 @@ async function getDownloaderCategorise(downloader_id: number) {
  * 生成下载链接
  */
 const generate_magnet_url = async (flag: boolean) => {
-  await get_torrent_list()
   url_list.value.length = 0
   if (torrents.value.length < 0) {
     return
@@ -446,47 +451,26 @@ const push_torrent = async (downloader_id: number, category: string) => {
     }
   })
   messageApi.success('种子已推送，请检查下载器！')
+  open.value = false
 }
 
-/**
- * 显示页面悬浮窗
- */
-async function float_win() {
-  var wrap = document.getElementById("app");
 
-  var drag = {active: false, offset: {x: 0, y: 0}};
-
-
-  wrap!.addEventListener('mousedown', function (event) {
-    drag.active = true;
-    drag.offset.x = event.clientX - wrap!.offsetLeft;
-    drag.offset.y = event.clientY - wrap!.offsetTop + 240;
-    event.preventDefault();
-  });
-
-  document.addEventListener('mousemove', function (event) {
-    if (drag.active) {
-      wrap!.style.left = (event.clientX - drag.offset.x) + 'px';
-      wrap!.style.top = (event.clientY - drag.offset.y) + 'px';
-    }
-  });
-
-  document.addEventListener('mouseup', function (event) {
-    drag.active = false;
-  });
-}
-
-async function download_to(id: number) {
-  messageApi.info(`download_to 下载器ID：${id}。失望也是一种幸福，因为还有期待。期待我的到来吧，少年！`)
+async function download_to() {
+  await get_torrent_detail()
+  await generate_magnet_url(false)
+  modal_title.value = '正在下载当前种子...'
+  showModal()
 }
 
 async function download_all() {
+  await get_torrent_list()
   await generate_magnet_url(false)
   modal_title.value = '正在下载本页所有种子...'
   showModal()
 }
 
 async function download_free() {
+  await get_torrent_list()
   await generate_magnet_url(true)
   modal_title.value = '正在下载本页免费种子...'
   showModal()
@@ -545,6 +529,9 @@ onBeforeMount(async () => {
             size="small" block type="primary"
             @click="sync_cookie"
             v-if="user_detail_page">
+          <template #icon>
+            <SyncOutlined/>
+          </template>
           同步数据
         </a-button>
         <a-button
@@ -563,41 +550,44 @@ onBeforeMount(async () => {
             @click="download_free"
         >
           <template #icon>
-            <DownSquareFilled/>
+            <DownloadOutlined/>
           </template>
           下载免费
         </a-button>
+        <!--        <a-button-->
+        <!--            size="small" block-->
+        <!--            v-if="torrent_list_page"-->
+        <!--            @click="copy_all"-->
+        <!--        >-->
+        <!--          <template #icon>-->
+        <!--            <CopyFilled/>-->
+        <!--          </template>-->
+        <!--          复制链接-->
+        <!--        </a-button>-->
+        <!--        <a-button-->
+        <!--            size="small" block-->
+        <!--            v-if="torrent_list_page"-->
+        <!--            @click="copy_free"-->
+        <!--        >-->
+        <!--          <template #icon>-->
+        <!--            <CopyOutlined/>-->
+        <!--          </template>-->
+        <!--          复制免费-->
+        <!--        </a-button>-->
+        <!--        <a-button-->
+        <!--            size="small" block-->
+        <!--            v-if="torrent_detail_page"-->
+        <!--            @click="copy_link"-->
+        <!--        >-->
+        <!--          <template #icon>-->
+        <!--            <CopyOutlined/>-->
+        <!--          </template>-->
+        <!--          复制链接-->
+        <!--        </a-button>-->
         <a-button
             size="small" block
-            v-if="torrent_list_page"
-            @click="copy_all"
-        >
-          <template #icon>
-            <CopyFilled/>
-          </template>
-          复制链接
-        </a-button>
-        <a-button
-            size="small" block
-            v-if="torrent_list_page"
-            @click="copy_free"
-        >
-          <template #icon>
-            <CopyFilled/>
-          </template>
-          复制免费
-        </a-button>
-        <a-button
-            size="small" block
-            v-if="torrent_detail_page"
-            @click="copy_link"
-        >
-          <template #icon>
-            <CopyFilled/>
-          </template>
-          复制链接
-        </a-button>
-        <a-button size="small" block v-if="torrent_detail_page">
+            @click="download_to"
+            v-if="torrent_detail_page">
           <template #icon>
             <DownloadOutlined/>
           </template>
@@ -617,26 +607,16 @@ onBeforeMount(async () => {
           v-model:activeKey="activeKey"
           accordion
           style="background: rgb(255, 255, 255)"
+          expand-icon-position="end"
           :bordered="false"
-          collapsible="icon"
           @change="getDownloaderCategorise">
-        <a-collapse-panel v-for="d in downloaders" :key="d.id" :header="d.name">
-          <template #extra>
-            <a-button
-                type="dashed"
-                size="small"
-                style="font-size: 12px;"
-                @click="test_connect(d.id)"
-            >
-              <template #icon>
-                <a-image
-                    :width="16"
-                    style="margin-top: -3px;padding-right: 1px;"
-                    :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>
-              </template>
-              测试
-            </a-button>
-
+        <a-collapse-panel v-for="d in downloaders" :key="d.id">
+          <template #header>
+            <a-image
+                :width="16"
+                style="margin-top: -3px;padding-right: 1px;"
+                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>
+            {{ d.name }}
           </template>
           <a-space wrap align="center">
             <a-button
