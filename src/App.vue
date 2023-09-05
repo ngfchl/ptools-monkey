@@ -92,10 +92,12 @@ async function init_button() {
   if (location.pathname.startsWith('/userdetails.php')) {
     console.log('当前为个人信息页')
     user_detail_page.value = true
+    await sync_cookie()
   }
   if (location.pathname.search(/usercp.php/) > 0) {
     console.log('当前为控制面板页')
     user_detail_page.value = true
+    await sync_cookie()
   }
 }
 
@@ -153,7 +155,7 @@ async function getCookie() {
  * @returns
  */
 async function getSiteData() {
-  var site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+  let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
   console.log(site_info)
   if (site_info === false) {
     alert('ptools服务器连接失败！')
@@ -181,8 +183,46 @@ async function getSiteData() {
     alert('用户ID获取失败！')
     return false
   }
+  let data = `user_id=${user_id}&nickname=${site_info.name}&site=${site_info.id}&cookie=${cookie}&user_agent=${user_agent}`
+  let passkey = getPasskey()
+  console.log(passkey)
+  if (passkey != false) {
+    data += `&passkey=${passkey}`
+  }
+  let time_join = getTimeJoin()
+  console.log(time_join)
+  if (time_join != false) {
+    data += `&time_join=${time_join}`
+  }
   // &token.value=${token.value}
-  return `user_id=${user_id}&nickname=${site_info.name}&site=${site_info.id}&cookie=${cookie}&user_agent=${user_agent}`
+  return data
+}
+
+/**
+ * 获取passkey
+ */
+const getPasskey = () => {
+  try {
+    let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+    let passkey = document.evaluate(site_info.my_passkey_rule, document).iterateNext()!.textContent
+    return passkey!.trim()
+  } catch (e) {
+    console.error(e)
+    return false
+  }
+}
+/**
+ * 获取passkey
+ */
+const getTimeJoin = () => {
+  try {
+    let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+    let time_join = document.evaluate(site_info.my_time_join_rule, document).iterateNext()!.textContent
+    return time_join!.trim()
+  } catch (e) {
+    console.error(e)
+    return false
+  }
 }
 
 /**
@@ -190,7 +230,7 @@ async function getSiteData() {
  */
 async function sync_cookie() {
   await getSite()
-  var data = await getSiteData();
+  let data = await getSiteData();
   console.log(data)
   if (data) {
     return await send_site_info(data).then(res => {
@@ -241,7 +281,7 @@ async function get_torrent_list() {
     await getSite()
   }
   torrents.value.length = 0
-  var site_info = JSON.parse(o!)
+  let site_info = JSON.parse(o!)
   let torrent_list = xpath(site_info.torrents_rule.replace("]/tr", "]/tbody/tr"), document)
   for (let i = 0; i <= torrent_list.snapshotLength; i++) {
     try {
