@@ -18,8 +18,12 @@ export default defineConfig({
         monkey({
             entry: 'src/main.ts',
             userscript: {
-                icon: 'https://vitejs.dev/logo.svg',
-                namespace: 'npm/vite-plugin-monkey',
+                name: 'PtToPtools-Dev',
+                icon: 'https://192.168.123.5:5173/ptools.svg',
+                namespace: 'http://tampermonkey.net/',
+                version: '2023.09.06.02',
+                author: 'ngfchl',
+                description: 'PT站点信息与PTools同步及种子推送到下载器',
                 match: [
                     'https://ptchdbits.co/*',
                     'https://www.gamegamept.com/*',

@@ -8,7 +8,7 @@ import {
   DownloadOutlined
 } from '@ant-design/icons-vue'
 
-const api = ref('http://127.0.0.1:8080/')
+const api = ref('http://192.168.123.5:5173/')
 const token = ref('ptools')
 
 interface Torrent {
@@ -569,7 +569,6 @@ onBeforeMount(async () => {
 
 <template>
   <div class="wrap">
-    <context-holder/>
     <a-image
         :preview="false"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
