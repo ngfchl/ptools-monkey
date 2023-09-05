@@ -11,13 +11,9 @@ declare module 'vue' {
     AButton: typeof import('ant-design-vue/es')['Button']
     ACollapse: typeof import('ant-design-vue/es')['Collapse']
     ACollapsePanel: typeof import('ant-design-vue/es')['CollapsePanel']
-    AFloatButton: typeof import('ant-design-vue/es')['FloatButton']
-    AFloatButtonGroup: typeof import('ant-design-vue/es')['FloatButtonGroup']
     AImage: typeof import('ant-design-vue/es')['Image']
     AModal: typeof import('ant-design-vue/es')['Modal']
     ASpace: typeof import('ant-design-vue/es')['Space']
     ASpaceCompact: typeof import('ant-design-vue/es')['Compact']
-    ATag: typeof import('ant-design-vue/es')['Tag']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
   }
 }
