@@ -89,12 +89,12 @@ async function init_button() {
    * 初始化页面按钮
    */
   console.log('开始初始化按钮')
-  if(location.origin === 'https://hdcity.city' ){
+  if (location.origin === 'https://hdcity.city') {
     user_detail_page.value = false
-  if(location.pathname.startsWith('/userdetails')){
-    user_detail_page.value = true
-  }
-  }else {
+    if (location.pathname.startsWith('/userdetails')) {
+      user_detail_page.value = true
+    }
+  } else {
     user_detail_page.value = true
   }
 
@@ -631,12 +631,13 @@ onBeforeMount(async () => {
         style="width: 100%;"
     >
       <a-space-compact direction="vertical">
-        <a-button danger ghost block style="width: 110px;">
+        <a-button
+            danger type="link"
+            block style="width: 110px;"
+            :href="api" target="_blank"
+        >
           <template #icon>
-            <a-image
-                :width="16"
-                style="margin-top: -3px;padding-right: 1px;"
-                :src="`${api}ptools.svg`"/>
+            <sync-outlined :spin="true" />
           </template>
           PTools
         </a-button>
