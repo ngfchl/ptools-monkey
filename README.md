@@ -1,18 +1,101 @@
-# Vue 3 + TypeScript + Vite
+# PtToPtools-Dev
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 技术栈
 
-## Recommended IDE Setup
+1. Vue 3 + TypeScript + Vite
+2. Ant Design Vue
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 功能
 
-## Type Support For `.vue` Imports in TS
+1. 全新界面，使用 antdesignvue 重构，优化界面显示
+2. 个人主页与控制面板页面自动同步 Cookie 等信息
+3. 种子列表页增加全部推送与免费种子推送
+4. 种子详情页增加推送到下载器功能
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+## 不能使用的站点
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+1. 海胆种子页面无法使用油猴，不能正常显示
+2. 朱雀无法使用油猴，页面错乱
+3. 部分站点种子筛选规则尚未完善
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+## 安装油猴插件
+
+> ### <font color="red">请使用红色油猴安装本脚本</font>
+>
+> ### <font color="red">请使用红色油猴安装本脚本</font>
+>
+> ### <font color="red">请使用红色油猴安装本脚本</font>
+>
+> ### <font color="orange">油猴脚本不仅仅支持同步Cookie，也支持添加站点</font>
+
+红色油猴脚本即油猴测试版，Beta版，
+
+![image-20230630100049242](https://img.ptools.fun/blog/image-20230630100049242.png)
+
+![image-20230630100212785](https://img.ptools.fun/blog/image-20230630100212785.png)
+
+油猴测试版下载地址：
+
+[EDGE浏览器](https://microsoftedge.microsoft.com/addons/detail/fcmfnpggmnlmfebfghbfnillijihnkoh)
+
+[CHROME](https://chrome.google.com/webstore/detail/gcalenpjmijncebpfijmoaglllgpjagf)
+
+## 安装油猴脚本
+
+PtToPTools脚本下载地址
+
+[点击访问](https://greasyfork.org/zh-CN/scripts/458791-pttoptools-dev)
+
+## 修改相关配置
+
+1. 在脚本中搜索`192.168.123.5:5173`，将之改为你自己的ptools访问地址，有基础改几处
+
+   ![image-20230629145646264](https://img.ptools.fun/blog/image-20230629145646264.png)
+
+   ![image-20230629145705594](https://img.ptools.fun/blog/image-20230629145705594.png)
+
+   ![image-20230629145735151](https://img.ptools.fun/blog/image-20230629145735151.png)
+
+   ![image-20230906034426891](https://img.ptools.fun/blog/image-20230906034426891.png)
+
+2. 修改TOKEN，使得脚本中的TOKEN与PTools中的TOKEN保持一致。
+
+   ```toml
+      [token]
+      token="ptools"
+   ```
+   ![](https://img.ptools.fun/blog/202306291309849.png)
+
+## 同步Cookie
+
+在个人主页与控制面板会自动同步cookie、UID，UserAgent、Passkey、注册时间
+
+![image-20230906035538885](https://img.ptools.fun/blog/image-20230906035538885.png)
+
+![image-20230906035619484](https://img.ptools.fun/blog/image-20230906035619484.png)
+
+> PS：油猴脚本会覆盖自定义站点名称，请自行决定是否使用
+
+## 下载种子
+
+点击下载会弹出下载器选择界面，QB下载器显示分类，TR下载器显示常用文件夹内，点击即可开始下载！
+
+![image-20230906035414077](https://img.ptools.fun/blog/image-20230906035414077.png)
+
+![image-20230906035419401](https://img.ptools.fun/blog/image-20230906035419401.png)
+
+## 错误处理
+
+1. 检查是否为红猴，不是的请换红猴
+
+2. 检查黑猴中是否有PTOOLS的脚本，有的请删除或者关闭
+
+3. 仍不能使用的，按F12打开开发者模式，找到应用程序标签，尝试清除会话存储后重试
+
+   ![image-20230630100951854](https://img.ptools.fun/blog/image-20230630100951854.png)
+
+   ![](https://img.ptools.fun/blog/image-20230630100951854.png)
+
+4. 仍不能用的，看控制台(或Console)报错信息
+
+   ![image-20230630100916831](https://img.ptools.fun/blog/image-20230630100916831.png)
