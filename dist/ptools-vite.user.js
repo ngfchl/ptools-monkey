@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         PtToPtools-Dev
 // @namespace    http://tampermonkey.net/
-// @version      2023.09.06.02
+// @version      2023.09.06.03
 // @author       ngfchl
 // @description  PT站点信息与PTools同步及种子推送到下载器
-// @icon         https://192.168.123.5:5173/ptools.svg
+// @icon         https://img.ptools.fun/blog/209271688287909_.pic.jpg
 // @match        https://ptchdbits.co/*
 // @match        https://www.gamegamept.com/*
 // @match        https://www.ptlsp.com/*
@@ -134,7 +134,7 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' #app{padding:2rem;text-align:center;position:fixed;top:0;z-index:9999;width:100px;margin-right:0;margin-left:0;margin-top:240px;float:left;opacity:.8;font-size:12px;background-color:#fff}html,body{width:100%;height:100%}input::-ms-clear,input::-ms-reveal{display:none}*,*:before,*:after{box-sizing:border-box}html{font-family:sans-serif;line-height:1.15;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;-ms-overflow-style:scrollbar;-webkit-tap-highlight-color:rgba(0,0,0,0)}@-ms-viewport{width:device-width}body{margin:0}[tabindex="-1"]:focus{outline:none}hr{box-sizing:content-box;height:0;overflow:visible}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5em;font-weight:500}p{margin-top:0;margin-bottom:1em}abbr[title],abbr[data-original-title]{-webkit-text-decoration:underline dotted;text-decoration:underline;text-decoration:underline dotted;border-bottom:0;cursor:help}address{margin-bottom:1em;font-style:normal;line-height:inherit}input[type=text],input[type=password],input[type=number],textarea{-webkit-appearance:none}ol,ul,dl{margin-top:0;margin-bottom:1em}ol ol,ul ul,ol ul,ul ol{margin-bottom:0}dt{font-weight:500}dd{margin-bottom:.5em;margin-left:0}blockquote{margin:0 0 1em}dfn{font-style:italic}b,strong{font-weight:bolder}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}pre,code,kbd,samp{font-size:1em;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace}pre{margin-top:0;margin-bottom:1em;overflow:auto}figure{margin:0 0 1em}img{vertical-align:middle;border-style:none}a,area,button,[role=button],input:not([type=range]),label,select,summary,textarea{touch-action:manipulation}table{border-collapse:collapse}caption{padding-top:.75em;padding-bottom:.3em;text-align:left;caption-side:bottom}input,button,select,optgroup,textarea{margin:0;color:inherit;font-size:inherit;font-family:inherit;line-height:inherit}button,input{overflow:visible}button,select{text-transform:none}button,html [type=button],[type=reset],[type=submit]{-webkit-appearance:button}button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{padding:0;border-style:none}input[type=radio],input[type=checkbox]{box-sizing:border-box;padding:0}input[type=date],input[type=time],input[type=datetime-local],input[type=month]{-webkit-appearance:listbox}textarea{overflow:auto;resize:vertical}fieldset{min-width:0;margin:0;padding:0;border:0}legend{display:block;width:100%;max-width:100%;margin-bottom:.5em;padding:0;color:inherit;font-size:1.5em;line-height:inherit;white-space:normal}progress{vertical-align:baseline}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:none}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}summary{display:list-item}template{display:none}[hidden]{display:none!important}mark{padding:.2em;background-color:#feffe6}.wrap[data-v-7773691e]{position:fixed;top:0;z-index:99999;width:110px;margin-right:0;margin-left:0;margin-top:240px;float:left;opacity:.8;font-size:12px;background-color:#fff}.wrap[data-v-7773691e]:hover{opacity:1}.wrap>img[data-v-7773691e],.image[data-v-7773691e]{border-radius:2px;width:100%} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' #app{padding:2rem;text-align:center;position:fixed;top:0;z-index:9999;width:100px;margin-right:0;margin-left:0;margin-top:240px;float:left;opacity:.8;font-size:12px;background-color:#fff}html,body{width:100%;height:100%}input::-ms-clear,input::-ms-reveal{display:none}*,*:before,*:after{box-sizing:border-box}html{font-family:sans-serif;line-height:1.15;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;-ms-overflow-style:scrollbar;-webkit-tap-highlight-color:rgba(0,0,0,0)}@-ms-viewport{width:device-width}body{margin:0}[tabindex="-1"]:focus{outline:none}hr{box-sizing:content-box;height:0;overflow:visible}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5em;font-weight:500}p{margin-top:0;margin-bottom:1em}abbr[title],abbr[data-original-title]{-webkit-text-decoration:underline dotted;text-decoration:underline;text-decoration:underline dotted;border-bottom:0;cursor:help}address{margin-bottom:1em;font-style:normal;line-height:inherit}input[type=text],input[type=password],input[type=number],textarea{-webkit-appearance:none}ol,ul,dl{margin-top:0;margin-bottom:1em}ol ol,ul ul,ol ul,ul ol{margin-bottom:0}dt{font-weight:500}dd{margin-bottom:.5em;margin-left:0}blockquote{margin:0 0 1em}dfn{font-style:italic}b,strong{font-weight:bolder}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}pre,code,kbd,samp{font-size:1em;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace}pre{margin-top:0;margin-bottom:1em;overflow:auto}figure{margin:0 0 1em}img{vertical-align:middle;border-style:none}a,area,button,[role=button],input:not([type=range]),label,select,summary,textarea{touch-action:manipulation}table{border-collapse:collapse}caption{padding-top:.75em;padding-bottom:.3em;text-align:left;caption-side:bottom}input,button,select,optgroup,textarea{margin:0;color:inherit;font-size:inherit;font-family:inherit;line-height:inherit}button,input{overflow:visible}button,select{text-transform:none}button,html [type=button],[type=reset],[type=submit]{-webkit-appearance:button}button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{padding:0;border-style:none}input[type=radio],input[type=checkbox]{box-sizing:border-box;padding:0}input[type=date],input[type=time],input[type=datetime-local],input[type=month]{-webkit-appearance:listbox}textarea{overflow:auto;resize:vertical}fieldset{min-width:0;margin:0;padding:0;border:0}legend{display:block;width:100%;max-width:100%;margin-bottom:.5em;padding:0;color:inherit;font-size:1.5em;line-height:inherit;white-space:normal}progress{vertical-align:baseline}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:none}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}summary{display:list-item}template{display:none}[hidden]{display:none!important}mark{padding:.2em;background-color:#feffe6}.wrap[data-v-a4606b30]{position:fixed;top:0;z-index:99999;width:110px;margin-right:0;margin-left:0;margin-top:240px;float:left;opacity:.8;font-size:12px;background-color:#fff}.wrap[data-v-a4606b30]:hover{opacity:1}.wrap>img[data-v-a4606b30],.image[data-v-a4606b30]{border-radius:2px;width:100%} ');
 
 (function (vue) {
   'use strict';
@@ -144,7 +144,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-a3951564.js"(exports, module) {
+    "main-fcce5dc1.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -20270,7 +20270,7 @@ summary tabindex target title type usemap value width wmode wrap`;
       const _sfc_main = /* @__PURE__ */ vue.defineComponent({
         __name: "App",
         setup(__props) {
-          const api2 = vue.ref("http://192.168.123.5:5173/");
+          const api2 = vue.ref("http://127.0.0.1:8080/");
           const token2 = vue.ref("ptools");
           message.config({
             top: `50px`
@@ -20305,13 +20305,17 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
           async function init_button() {
             console.log("开始初始化按钮");
-            if (location.pathname.startsWith("/details.php") || location.pathname.includes("/torrent.php") || location.pathname.search(/torrents\D*\d+/) > 0) {
+            if (location.pathname.startsWith("/details.php") || location.pathname.includes("/torrent.php") || location.pathname.includes("/Torrents/details") || location.pathname.search(/torrents\D*\d+/) > 0) {
               console.log("当前为种子详情页");
               torrent_detail_page.value = true;
+              await get_torrent_detail();
+              await sync_torrents();
             }
-            if (location.pathname.search(/torrents\D*$/) > 0 || location.pathname.search(/t$/) > 0 || location.pathname.includes("/music.php") || location.pathname.includes("/torrents.php")) {
+            if (location.pathname.search(/torrents\D*$/) > 0 || location.pathname.search(/t$/) > 0 || location.pathname.endsWith("/Torrents") || location.pathname.includes("/music.php") || location.pathname.includes("/special.php") || location.pathname.includes("/live.php") || location.pathname.includes("/torrents.php")) {
               console.log("当前为种子列表页");
               torrent_list_page.value = true;
+              await get_torrent_list();
+              await sync_torrents();
             }
             if (location.pathname.startsWith("/userdetails") || location.href.includes("/user.php?id=") || location.href.includes("/user.php?u=") || location.href.includes("/index.php?page=usercp&uid=") || location.href.includes("/Users/profile?uid=") || location.href.includes("/profile/") || location.href.includes("/users/")) {
               console.log("当前为个人信息页");
@@ -20334,12 +20338,12 @@ summary tabindex target title type usemap value width wmode wrap`;
                 onload: function(response) {
                   let res = response.response;
                   console.log(res);
-                  if (res.code) {
+                  if (res.code === 0) {
                     console.log(res.msg);
                     resolve(false);
                   }
-                  sessionStorage.setItem("ptools", JSON.stringify(res));
-                  resolve(res);
+                  sessionStorage.setItem("ptools", JSON.stringify(res.data));
+                  resolve(res.data);
                 },
                 onerror: function() {
                   console.log("服务器连接失败！");
@@ -20486,7 +20490,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                 let leechers = xpath(site_info.torrent_leechers_rule, torrent_info).snapshotItem(0);
                 let magnet_url = xpath(site_info.torrent_magnet_url_rule, torrent_info).snapshotItem(0);
                 let poster = xpath(site_info.torrent_poster_rule, torrent_info).snapshotItem(0);
-                let release = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0);
+                let published = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0);
                 let sale_expire = xpath(site_info.torrent_sale_expire_rule, torrent_info).snapshotItem(0);
                 let sale = xpath(site_info.torrent_sale_rule, torrent_info).snapshotItem(0);
                 let seeders = xpath(site_info.torrent_seeders_rule, torrent_info).snapshotItem(0);
@@ -20495,7 +20499,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                 let tags = xpath(site_info.torrent_tags_rule, torrent_info);
                 if (magnet_url && magnet_url.textContent.indexOf("id=") > 0) {
                   const idPattern = /id=(\d+)/;
-                  tid = magnet_url.textContent.match(idPattern)[1];
+                  tid = Number(magnet_url.textContent.match(idPattern)[1]);
                 }
                 let tag = [];
                 for (let i22 = 0; i22 < tags.snapshotLength; i22++) {
@@ -20508,19 +20512,20 @@ summary tabindex target title type usemap value width wmode wrap`;
                   subtitle: subtitle ? subtitle.textContent : "",
                   size: size_items ? `${size_items.snapshotItem(0).textContent} ${size_items.snapshotItem(1).textContent}` : "",
                   category: category ? category.textContent : "",
-                  completers: completers ? completers.textContent : "",
+                  completers: completers ? completers.textContent : 0,
                   // detail_url: detail_url ? detail_url.textContent : '',
-                  hr: hr ? hr.textContent : "",
-                  leechers: leechers ? leechers.textContent : "",
+                  hr: !hr,
+                  leechers: leechers ? leechers.textContent : 0,
                   magnet_url: magnet_url ? magnet_url.textContent : "",
                   // poster: poster ? poster.textContent : '',
-                  release: release ? release.textContent : "",
+                  published: published ? published.textContent : "",
                   sale_expire: sale_expire ? sale_expire.textContent : "",
                   sale_status: sale ? sale.textContent : "",
-                  seeders: seeders ? seeders.textContent : "",
+                  seeders: seeders ? seeders.textContent : 0,
                   poster: poster ? poster.textContent : "",
                   tags: tags.snapshotLength > 0 ? tag.join() : "",
-                  tid
+                  tid,
+                  site_id: site_info.id
                 };
                 torrents.value.push(torrent);
               } catch (e2) {
@@ -20547,7 +20552,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             let tags = xpath(site_info.detail_tags_rule, document);
             let hr = xpath(site_info.detail_hr_rule, document).snapshotItem(0);
             if (magnet_url && magnet_url.textContent.indexOf("id=") > 0) {
-              tid = magnet_url.textContent.match(/id=(\d+)/)[1];
+              tid = Number(magnet_url.textContent.match(/id=(\d+)/)[1]);
               console.log(tid);
             }
             let tag = [];
@@ -20556,15 +20561,16 @@ summary tabindex target title type usemap value width wmode wrap`;
             }
             let torrent = {
               tid,
+              site_id: site_info.id,
               title: title ? title.textContent.trim() : "",
               subtitle: subtitle ? subtitle.textContent.trim() : "",
               size: size ? size.textContent.trim() : "",
               category: category ? category.textContent.trim() : "",
               // completers: completers ? completers.textContent : '',
-              hr: hr ? hr.textContent.trim() : "",
+              hr: hr ? false : true,
               magnet_url: magnet_url ? magnet_url.textContent.trim() : "",
               // poster: poster ? poster.textContent : '',
-              sale_expire: sale_expire ? sale_expire.textContent.trim() : "",
+              sale_expire: sale_expire ? sale_expire.textContent.trim() : null,
               sale_status: sale_status ? sale_status.textContent.trim() : "",
               // seeders: seeders ? seeders.textContent : '',
               douban_url: douban_url ? douban_url.textContent.trim() : "",
@@ -20674,6 +20680,28 @@ summary tabindex target title type usemap value width wmode wrap`;
             message.success("种子已推送，请检查下载器！");
             open.value = false;
           };
+          const sync_torrents = async () => {
+            _GM_xmlhttpRequest({
+              url: `${api2.value}api/monkey/parse_torrents`,
+              method: "POST",
+              // responseType: "json",
+              headers: { "Content-Type": "application/json" },
+              data: JSON.stringify(torrents.value),
+              onload: function(response) {
+                console.log(response.response);
+                let res = JSON.parse(response.response);
+                console.log(res);
+                if (res.code == 0) {
+                  console.log("种子信息同步成功！", res.msg);
+                } else {
+                  console.log(res);
+                }
+              },
+              onerror: function() {
+                console.error("种子信息同步失败");
+              }
+            });
+          };
           async function download_to() {
             await get_torrent_detail();
             await generate_magnet_url(false);
@@ -20683,13 +20711,13 @@ summary tabindex target title type usemap value width wmode wrap`;
           async function download_all() {
             await get_torrent_list();
             await generate_magnet_url(false);
-            modal_title.value = "正在下载本页所有种子...";
+            modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`;
             showModal();
           }
           async function download_free() {
             await get_torrent_list();
             await generate_magnet_url(true);
-            modal_title.value = "正在下载本页免费种子...";
+            modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`;
             showModal();
           }
           const init = vue.ref(0);
@@ -20895,7 +20923,7 @@ summary tabindex target title type usemap value width wmode wrap`;
         }
         return target;
       };
-      const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-7773691e"]]);
+      const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a4606b30"]]);
       vue.createApp(App).mount(
         (() => {
           const element_ptools = document.createElement("div");

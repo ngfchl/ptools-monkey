@@ -19,9 +19,9 @@ export default defineConfig({
             entry: 'src/main.ts',
             userscript: {
                 name: 'PtToPtools-Dev',
-                icon: 'https://192.168.123.5:5173/ptools.svg',
+                icon: 'https://img.ptools.fun/blog/209271688287909_.pic.jpg',
                 namespace: 'http://tampermonkey.net/',
-                version: '2023.09.06.02',
+                version: '2023.09.06.03',
                 author: 'ngfchl',
                 description: 'PT站点信息与PTools同步及种子推送到下载器',
                 match: [

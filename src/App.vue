@@ -8,19 +8,21 @@ import {
   DownloadOutlined
 } from '@ant-design/icons-vue'
 
-const api = ref('http://192.168.123.5:5173/')
+// const api = ref('http://192.168.123.5:5173/')
+const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
 
 interface Torrent {
-  tid: string
+  site_id: number
+  tid: number
   title: string
   category: string
   completers?: string
   leechers?: string
-  hr: string
+  hr: boolean
   magnet_url: string
   poster: string
-  release: string
+  published: string
   sale_expire: string
   sale_status: string
   seeders: string
@@ -87,14 +89,28 @@ async function init_button() {
    * 初始化页面按钮
    */
   console.log('开始初始化按钮')
-  if (location.pathname.startsWith('/details.php') || location.pathname.includes('/torrent.php') || location.pathname.search(/torrents\D*\d+/) > 0) {
+  if (location.pathname.startsWith('/details.php')
+      || location.pathname.includes('/torrent.php')
+      || location.pathname.includes('/Torrents/details')
+      || location.pathname.search(/torrents\D*\d+/) > 0
+  ) {
     console.log('当前为种子详情页')
     torrent_detail_page.value = true
+    await get_torrent_detail()
+    await sync_torrents()
   }
 
-  if (location.pathname.search(/torrents\D*$/) > 0 || location.pathname.search(/t$/) > 0 || location.pathname.includes('/music.php') || location.pathname.includes('/torrents.php')) {
+  if (location.pathname.search(/torrents\D*$/) > 0 ||
+      location.pathname.search(/t$/) > 0 ||
+      location.pathname.endsWith('/Torrents') ||
+      location.pathname.includes('/music.php') ||
+      location.pathname.includes('/special.php') ||
+      location.pathname.includes('/live.php') ||
+      location.pathname.includes('/torrents.php')) {
     console.log('当前为种子列表页')
     torrent_list_page.value = true
+    await get_torrent_list()
+    await sync_torrents()
   }
   if (location.pathname.startsWith('/userdetails') ||
       location.href.includes('/user.php?id=') ||
@@ -133,12 +149,12 @@ async function getSite() {
       onload: function (response) {
         let res = response.response
         console.log(res)
-        if (res.code) {
+        if (res.code === 0) {
           console.log(res.msg)
           resolve(false)
         }
-        sessionStorage.setItem('ptools', JSON.stringify(res))
-        resolve(res)
+        sessionStorage.setItem('ptools', JSON.stringify(res.data))
+        resolve(res.data)
       },
       onerror: function () {
         console.log('服务器连接失败！')
@@ -318,7 +334,7 @@ async function get_torrent_list() {
       let leechers = xpath(site_info.torrent_leechers_rule, torrent_info).snapshotItem(0)
       let magnet_url = xpath(site_info.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
       let poster = xpath(site_info.torrent_poster_rule, torrent_info).snapshotItem(0)
-      let release = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0)
+      let published = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0)
       let sale_expire = xpath(site_info.torrent_sale_expire_rule, torrent_info).snapshotItem(0)
       let sale = xpath(site_info.torrent_sale_rule, torrent_info).snapshotItem(0)
       let seeders = xpath(site_info.torrent_seeders_rule, torrent_info).snapshotItem(0)
@@ -328,7 +344,7 @@ async function get_torrent_list() {
 
       if (magnet_url && magnet_url.textContent!.indexOf("id=") > 0) {
         const idPattern = /id=(\d+)/; // 匹配以"id="开头的数字
-        tid = magnet_url.textContent!.match(idPattern)![1]
+        tid = Number(magnet_url.textContent!.match(idPattern)![1])
       }
       let tag = []
       for (let i = 0; i < tags.snapshotLength; i++) {
@@ -341,17 +357,18 @@ async function get_torrent_list() {
         subtitle: subtitle ? subtitle.textContent : '',
         size: size_items ? `${size_items.snapshotItem(0)!.textContent} ${size_items.snapshotItem(1)!.textContent}` : '',
         category: category ? category.textContent : '',
-        completers: completers ? completers.textContent : '', // detail_url: detail_url ? detail_url.textContent : '',
-        hr: hr ? hr.textContent : '',
-        leechers: leechers ? leechers.textContent : '',
+        completers: completers ? completers.textContent : 0, // detail_url: detail_url ? detail_url.textContent : '',
+        hr: !hr,
+        leechers: leechers ? leechers.textContent : 0,
         magnet_url: magnet_url ? magnet_url.textContent : '', // poster: poster ? poster.textContent : '',
-        release: release ? release.textContent : '',
+        published: published ? published.textContent : '',
         sale_expire: sale_expire ? sale_expire.textContent : '',
         sale_status: sale ? sale.textContent : '',
-        seeders: seeders ? seeders.textContent : '',
+        seeders: seeders ? seeders.textContent : 0,
         poster: poster ? poster.textContent : '',
         tags: tags.snapshotLength > 0 ? tag.join() : '',
         tid: tid,
+        site_id: site_info.id,
       }
       torrents.value.push(torrent)
     } catch (e) {
@@ -383,7 +400,7 @@ async function get_torrent_detail() {
   let hr = xpath(site_info.detail_hr_rule, document).snapshotItem(0)
 
   if (magnet_url && magnet_url!.textContent!.indexOf("id=") > 0) {
-    tid = magnet_url!.textContent!.match(/id=(\d+)/)![1]
+    tid = Number(magnet_url!.textContent!.match(/id=(\d+)/)![1])
     console.log(tid)
   }
   let tag = []
@@ -392,13 +409,14 @@ async function get_torrent_detail() {
   }
   let torrent = {
     tid: tid,
+    site_id: site_info.id,
     title: title ? title.textContent!.trim() : '',
     subtitle: subtitle ? subtitle.textContent!.trim() : '',
     size: size ? size.textContent!.trim() : '',
     category: category ? category.textContent!.trim() : '', // completers: completers ? completers.textContent : '',
-    hr: hr ? hr.textContent!.trim() : '',
+    hr: !hr,
     magnet_url: magnet_url ? magnet_url.textContent!.trim() : '', // poster: poster ? poster.textContent : '',
-    sale_expire: sale_expire ? sale_expire.textContent!.trim() : '',
+    sale_expire: sale_expire ? sale_expire.textContent!.trim() : null,
     sale_status: sale_status ? sale_status.textContent!.trim() : '', // seeders: seeders ? seeders.textContent : '',
     douban_url: douban_url ? douban_url.textContent!.trim() : '',
     files_count: files_count ? files_count.textContent!.match(/\d+/g)![0] : null,
@@ -516,6 +534,32 @@ const push_torrent = async (downloader_id: number, category: string) => {
 }
 
 
+/**
+ * 同步种子信息到 ptools
+ */
+const sync_torrents = async () => {
+  GM_xmlhttpRequest({
+    url: `${api.value}api/monkey/parse_torrents`,
+    method: "POST",
+    // responseType: "json",
+    headers: {"Content-Type": "application/json"},
+    data: JSON.stringify(torrents.value),
+    onload: function (response) {
+      console.log(response.response)
+      let res = JSON.parse(response.response)
+      console.log(res)
+      if (res.code == 0) {
+        console.log('种子信息同步成功！', res.msg)
+        // message.success('PTools提醒您：' + res.msg)
+      } else {
+        console.log(res)
+      }
+    }, onerror: function () {
+      console.error("种子信息同步失败")
+    }
+  })
+}
+
 async function download_to() {
   await get_torrent_detail()
   await generate_magnet_url(false)
@@ -526,14 +570,14 @@ async function download_to() {
 async function download_all() {
   await get_torrent_list()
   await generate_magnet_url(false)
-  modal_title.value = '正在下载本页所有种子...'
+  modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`
   showModal()
 }
 
 async function download_free() {
   await get_torrent_list()
   await generate_magnet_url(true)
-  modal_title.value = '正在下载本页免费种子...'
+  modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`
   showModal()
 }
 
@@ -619,6 +663,16 @@ onBeforeMount(async () => {
         </a-button>
         <!--        <a-button-->
         <!--            size="small" block-->
+        <!--            v-if="torrent_list_page || torrent_detail_page"-->
+        <!--            @click="sync_torrents"-->
+        <!--        >-->
+        <!--          <template #icon>-->
+        <!--            <DownloadOutlined/>-->
+        <!--          </template>-->
+        <!--          sync-->
+        <!--        </a-button>-->
+        <!--        <a-button-->
+        <!--            size="small" block-->
         <!--            v-if="torrent_list_page"-->
         <!--            @click="copy_all"-->
         <!--        >-->
@@ -674,14 +728,14 @@ onBeforeMount(async () => {
           :bordered="false"
           @change="getDownloaderCategorise">
         <a-collapse-panel v-for="d in downloaders" :key="d.id" style="font-size: 16px;">
-          <template #header >
+          <template #header>
             <a-avatar :size="18">
-              {{d.category}}
+              {{ d.category }}
             </a-avatar>
-<!--            <a-image-->
-<!--                :width="16"-->
-<!--                style="margin-top: -3px;padding-right: 1px;"-->
-<!--                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>-->
+            <!--            <a-image-->
+            <!--                :width="16"-->
+            <!--                style="margin-top: -3px;padding-right: 1px;"-->
+            <!--                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>-->
             <span style="margin-left: 3px;">{{ d.name }}</span>
           </template>
           <a-space wrap align="center">
