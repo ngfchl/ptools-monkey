@@ -89,6 +89,15 @@ async function init_button() {
    * 初始化页面按钮
    */
   console.log('开始初始化按钮')
+  if(location.origin === 'https://hdcity.city' ){
+    user_detail_page.value = false
+  if(location.pathname.startsWith('/userdetails')){
+    user_detail_page.value = true
+  }
+  }else {
+    user_detail_page.value = true
+  }
+
   if (location.pathname.startsWith('/details.php')
       || location.pathname.includes('/torrent.php')
       || location.pathname.includes('/Torrents/details')
@@ -121,7 +130,6 @@ async function init_button() {
       location.href.includes('/users/')
   ) {
     console.log('当前为个人信息页')
-    user_detail_page.value = true
     await sync_cookie()
   }
   if (location.pathname.search(/usercp.php/) > 0 ||
