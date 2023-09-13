@@ -8,8 +8,8 @@ import {
   DownloadOutlined
 } from '@ant-design/icons-vue'
 
-// const api = ref('http://192.168.123.5:5173/')
-const api = ref('http://127.0.0.1:8080/')
+const api = ref('http://192.168.123.5:5173/')
+// const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
 
 interface Torrent {
@@ -90,10 +90,7 @@ async function init_button() {
    */
   console.log('开始初始化按钮')
   if (location.origin === 'https://hdcity.city') {
-    user_detail_page.value = false
-    if (location.pathname.startsWith('/userdetails')) {
-      user_detail_page.value = true
-    }
+    user_detail_page.value = location.pathname.startsWith('/userdetails');
   } else {
     user_detail_page.value = true
   }
@@ -180,7 +177,10 @@ async function getCookie() {
   return new Promise(async (resolve, reject) => {
     await GM_cookie.list({ // 异步,如果在return data之前还没执行完，部分站点会导致cookie不全。
       url: location.href
-    }, (cookies: { name: string, value: string }[]) => {
+    }, (cookies: {
+      name: string,
+      value: string
+    }[]) => {
       try {
         cookie.value = cookies.map(c => `${c.name}=${c.value}`).join('; ');
         console.log('【Debug】cookie:', cookie.value);
@@ -333,11 +333,10 @@ async function get_torrent_list() {
       let torrent_info = torrent_list.snapshotItem(i)
       // 未获取到数据节点，pass
       if (!torrent_info) continue
-      let tid = null
       let title = xpath(site_info.torrent_title_rule, torrent_info).snapshotItem(0)
       let category = xpath(site_info.torrent_category_rule, torrent_info).snapshotItem(0)
       let completers = xpath(site_info.torrent_completers_rule, torrent_info).snapshotItem(0)
-      // let detail_url = xpath(site_info.torrent_detail_url_rule, torrent_info).snapshotItem(0)
+      let detail_url = xpath(site_info.torrent_detail_url_rule, torrent_info).snapshotItem(0)
       let hr = xpath(site_info.torrent_hr_rule, torrent_info).snapshotItem(0)
       let leechers = xpath(site_info.torrent_leechers_rule, torrent_info).snapshotItem(0)
       let magnet_url = xpath(site_info.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
@@ -349,21 +348,26 @@ async function get_torrent_list() {
       let size_items = xpath(site_info.torrent_size_rule, torrent_info)
       let subtitle = xpath(site_info.torrent_subtitle_rule, torrent_info).snapshotItem(0)
       let tags = xpath(site_info.torrent_tags_rule, torrent_info)
+      let tid = detail_url!.textContent!.match(/id=(\d+)/)![1]
 
-      if (magnet_url && magnet_url.textContent!.indexOf("id=") > 0) {
-        const idPattern = /id=(\d+)/; // 匹配以"id="开头的数字
-        tid = Number(magnet_url.textContent!.match(idPattern)![1])
-      }
+      console.log(tid)
       let tag = []
       for (let i = 0; i < tags.snapshotLength; i++) {
         tag.push(tags.snapshotItem(i)!.textContent!.trim())
       }
+      let size = ''
+      if (location.host.includes('hdchina.org')) {
+        size = size_items.snapshotItem(0)!.textContent!
+      } else {
+        size = size_items ? `${size_items.snapshotItem(0)!.textContent} ${size_items.snapshotItem(1)!.textContent}` : ''
+      }
+
       // 未获取到种子ID，pass
       if (!tid) continue
       let torrent = {
         title: title ? title.textContent : '',
         subtitle: subtitle ? subtitle.textContent : '',
-        size: size_items ? `${size_items.snapshotItem(0)!.textContent} ${size_items.snapshotItem(1)!.textContent}` : '',
+        size: size,
         category: category ? category.textContent : '',
         completers: completers ? completers.textContent : 0, // detail_url: detail_url ? detail_url.textContent : '',
         hr: !hr,
@@ -391,7 +395,6 @@ async function get_torrent_list() {
 async function get_torrent_detail() {
   torrents.value.length = 0
   let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
-  let tid = null
   let title = xpath(site_info.detail_title_rule, document).snapshotItem(0)
   let subtitle = xpath(site_info.detail_subtitle_rule, document).snapshotItem(0)
   let magnet_url = xpath(site_info.detail_download_url_rule, document).snapshotItem(0)
@@ -406,11 +409,9 @@ async function get_torrent_detail() {
   let poster = xpath(site_info.detail_poster_rule, document).snapshotItem(0)
   let tags = xpath(site_info.detail_tags_rule, document)
   let hr = xpath(site_info.detail_hr_rule, document).snapshotItem(0)
+  let tid = location.search.match(/id=(\d+)/)![1]
 
-  if (magnet_url && magnet_url!.textContent!.indexOf("id=") > 0) {
-    tid = Number(magnet_url!.textContent!.match(/id=(\d+)/)![1])
-    console.log(tid)
-  }
+
   let tag = []
   for (let i = 0; i < tags.snapshotLength; i++) {
     tag.push(tags.snapshotItem(i)!.textContent!.trim())
@@ -461,9 +462,13 @@ async function getDownloaders() {
  */
 const test_connect = async (downloader_id: number) => {
   GM_xmlhttpRequest({
-    url: `${api.value}api/download/downloader/test?downloader_id=${downloader_id}`, method: "GET", responseType: "json", headers: {
+    url: `${api.value}api/download/downloader/test?downloader_id=${downloader_id}`,
+    method: "GET",
+    responseType: "json",
+    headers: {
       Authorization: token.value
-    }, onload: function (response) {
+    },
+    onload: function (response) {
       let res = response.response
       console.log(res)
       if (res.code !== 0) {
@@ -485,9 +490,13 @@ async function getDownloaderCategorise(downloader_id: number) {
   }
   await test_connect(downloader_id)
   GM_xmlhttpRequest({
-    url: `${api.value}api/download/downloaders/categories?downloader_id=${downloader_id}`, method: "GET", responseType: "json", headers: {
+    url: `${api.value}api/download/downloaders/categories?downloader_id=${downloader_id}`,
+    method: "GET",
+    responseType: "json",
+    headers: {
       Authorization: token.value
-    }, onload: function (response) {
+    },
+    onload: function (response) {
       let res = response.response
       console.log(res)
       if (!res || res.code !== 0) {
@@ -637,7 +646,7 @@ onBeforeMount(async () => {
             :href="api" target="_blank"
         >
           <template #icon>
-            <sync-outlined :spin="true" />
+            <sync-outlined :spin="true"/>
           </template>
           PTools
         </a-button>
