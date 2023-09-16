@@ -5,12 +5,34 @@ import {message} from "ant-design-vue"
 import {
   ArrowDownOutlined,
   SyncOutlined,
-  DownloadOutlined
+  DownloadOutlined,
+  PushpinFilled,
 } from '@ant-design/icons-vue'
 
-const api = ref('http://192.168.123.5:5173/')
-// const api = ref('http://127.0.0.1:8080/')
+// const api = ref('http://192.168.123.5:5173/')
+const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
+const drawer = ref(false)
+const repeat_info = ref<RepeatInfo>({
+  url_list: [],
+  can_list: []
+})
+
+interface Site {
+  'id': number
+  'name': string
+  'url': string
+  'logo': string
+}
+
+interface RepeatInfo {
+  url_list: {
+    download_url: string
+    details_url: string
+    site: Site
+  }[]
+  can_list: Site[]
+}
 
 interface Torrent {
   site_id: number
@@ -59,6 +81,7 @@ const downloaders = ref<Downloader[]>([])
 const user_detail_page = ref(false)
 const torrent_list_page = ref(false)
 const torrent_detail_page = ref(false)
+const torrent_detail_repeat = ref(false)
 const open = ref<boolean>(false);
 const categories = ref<Category[]>([])
 const cookie = ref<string>('')
@@ -104,6 +127,14 @@ async function init_button() {
     torrent_detail_page.value = true
     await get_torrent_detail()
     await sync_torrents()
+    let hash_string = torrents.value[0].hash_string
+    console.log(hash_string)
+    if (!hash_string) {
+      message.warning('未获取到 Hash_String！')
+      return
+    }
+    torrent_detail_repeat.value = true
+    await repeat(hash_string)
   }
 
   if (location.pathname.search(/torrents\D*$/) > 0 ||
@@ -577,6 +608,37 @@ const sync_torrents = async () => {
   })
 }
 
+
+/**
+ * 辅种助手
+ * 获取辅种嘻嘻
+ */
+async function repeat(hash_string: string) {
+
+  let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
+  GM_xmlhttpRequest({
+    url: `${api.value}api/monkey/torrents/iyuu`, method: "POST",
+    responseType: "json",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: token.value
+    },
+    data: `hash_string=${hash_string}&site_id=${site_info.id}`,
+    onload: function (response) {
+      let res = response.response
+      console.log(res)
+      if (res.code !== 0) {
+        console.log(res.msg)
+        message.warn(res.msg)
+      } else {
+        console.log('种子列表获取成功！', res)
+        repeat_info.value = res.data
+      }
+    }
+  })
+
+}
+
 async function download_to() {
   await get_torrent_detail()
   await generate_magnet_url(false)
@@ -728,6 +790,15 @@ onBeforeMount(async () => {
           </template>
           下载到...
         </a-button>
+        <a-button
+            size="small" block
+            @click="drawer = true"
+            v-if="torrent_detail_repeat">
+          <template #icon>
+            <PushpinFilled/>
+          </template>
+          辅种助手
+        </a-button>
       </a-space-compact>
       <!--      <a-space-compact direction="vertical">-->
       <!--        <a-button block @click="getDownloaders">下载器列表</a-button>-->
@@ -778,6 +849,59 @@ onBeforeMount(async () => {
         </a-collapse-panel>
       </a-collapse>
     </a-modal>
+    <a-drawer
+        :width="400" title="辅种助手" :zIndex="10001"
+        placement="right" :open="drawer" @close="drawer=!drawer"
+        :bodyStyle="{
+          padding:0
+        }"
+    >
+      <template #extra>
+        <a-avatar :src="`${api}ptools.svg`">
+          辅种助手
+        </a-avatar>
+      </template>
+      <a-card title="可辅种站点" style="width: 100%">
+        <a-space wrap align="center">
+          <a-button
+              v-for="info in repeat_info!.url_list"
+              type="primary"
+              ghost
+              size="small"
+              :href="info.details_url"
+              target="_blank"
+              :key="info.site.id"
+          >
+            <template #icon>
+              <a-image
+                  :preview="false"
+                  :src="info.site.logo" :width="13"
+                  :fallback="`${api}ptools.svg`"
+              ></a-image>
+            </template>
+            {{ info.site.name }}
+          </a-button>
+        </a-space>
+      </a-card>
+      <a-card title="可发布站点">
+        <a-space wrap align="center">
+          <a-button
+              size="small"
+              danger ghost
+              :href="site.url"
+              target="_blank"
+              v-for="site in repeat_info!.can_list" :key="site.id">
+            <template #icon>
+              <a-image
+                  :src="site.logo" :width="13"
+                  :fallback="`${api}ptools.svg`"
+              ></a-image>
+            </template>
+            {{ site.name }}
+          </a-button>
+        </a-space>
+      </a-card>
+    </a-drawer>
   </div>
 </template>
 
