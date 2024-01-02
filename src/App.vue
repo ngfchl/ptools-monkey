@@ -7,10 +7,11 @@ import {
   SyncOutlined,
   DownloadOutlined,
   PushpinFilled,
+  ThunderboltOutlined,
 } from '@ant-design/icons-vue'
 
-// const api = ref('http://192.168.123.5:5173/')
-const api = ref('http://127.0.0.1:8080/')
+const api = ref('http://192.168.123.5:5173/')
+// const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
 const drawer = ref(false)
 const repeat_info = ref<RepeatInfo>({
@@ -708,7 +709,7 @@ onBeforeMount(async () => {
             :href="api" target="_blank"
         >
           <template #icon>
-            <sync-outlined :spin="true"/>
+            <ThunderboltOutlined/>
           </template>
           PTools
         </a-button>
@@ -913,7 +914,6 @@ onBeforeMount(async () => {
   width: 110px;
   margin-right: 0;
   margin-left: 0;
-
   margin-top: 240px;
   float: left;
   opacity: 0.8;
