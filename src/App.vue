@@ -10,7 +10,7 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons-vue'
 
-const api = ref('http://192.168.123.5:5173/')
+const api = ref('http://192.168.123.5:28000/')
 // const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
 const drawer = ref(false)
@@ -91,7 +91,7 @@ const modal_title = ref<string>('下载到')
 
 const showModal = () => {
   if (downloaders.value.length <= 0) {
-    message.warning('没有可用的下载器！请现在ptools中添加！')
+    message.warning('没有可用的下载器！请先在ptools中添加！')
     return
   }
   if (torrents.value.length <= 0) {
@@ -177,12 +177,15 @@ async function init_button() {
  * @returns {Promise<unknown>}
  */
 async function getSite() {
-  const path = "api/monkey/get_site/"
+  const path = "api/auth/monkey/get_site/"
   return new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
-      url: `${api.value}${path}${token.value}/${document.location.host}`,
+      url: `${api.value}${path}${document.location.host}`,
       method: "GET",
       responseType: "json",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
       onload: function (response) {
         let res = response.response
         console.log(res)
@@ -190,7 +193,8 @@ async function getSite() {
           console.log(res.msg)
           resolve(false)
         }
-        sessionStorage.setItem('ptools', JSON.stringify(res.data))
+        sessionStorage.setItem('website', JSON.stringify(res.data.website))
+        sessionStorage.setItem('mySite', JSON.stringify(res.data.mysite))
         resolve(res.data)
       },
       onerror: function () {
@@ -229,7 +233,8 @@ async function getCookie() {
  * @returns
  */
 async function getSiteData() {
-  let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+  let site_info = JSON.parse(sessionStorage.getItem('website')!)
+  let mySiteId = sessionStorage.getItem('mySite')
   console.log(site_info)
   if (site_info === false) {
     message.error('ptools服务器连接失败！')
@@ -257,18 +262,22 @@ async function getSiteData() {
     message.error('用户ID获取失败！')
     return false
   }
-  let data = `user_id=${user_id}&nickname=${site_info.name}&site=${site_info.id}&cookie=${cookie}&user_agent=${user_agent}`
+  let data = `user_id=${user_id}&site=${site_info.name}&cookie=${cookie}&user_agent=${user_agent}`
+  if (mySiteId != '0') {
+    data += `&id=${mySiteId}`
+  }
+  if (mySiteId == '0') {
+    data += `&nickname=${site_info.name}`
+  }
   let passkey = getPasskey()
   console.log(passkey)
-  if (passkey != false) {
-    data += `&passkey=${passkey}`
-  }
+  data += `&passkey=${passkey == false ? null : passkey}`
+
   let time_join = getTimeJoin()
   console.log(time_join)
   if (time_join != false) {
     data += `&time_join=${time_join}`
   }
-  // &token.value=${token.value}
   return data
 }
 
@@ -277,7 +286,7 @@ async function getSiteData() {
  */
 const getPasskey = () => {
   try {
-    let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+    let site_info = JSON.parse(sessionStorage.getItem('website')!)
     let passkey = document.evaluate(site_info.my_passkey_rule, document).iterateNext()!.textContent
     return passkey!.trim()
   } catch (e) {
@@ -290,7 +299,7 @@ const getPasskey = () => {
  */
 const getTimeJoin = () => {
   try {
-    let site_info = JSON.parse(sessionStorage.getItem('ptools')!)
+    let site_info = JSON.parse(sessionStorage.getItem('website')!)
     let time_join = document.evaluate(site_info.my_time_join_rule, document).iterateNext()!.textContent
     return time_join!.trim()
         .replace('T', ' ')
@@ -321,10 +330,17 @@ async function sync_cookie() {
  * @param data
  */
 async function send_site_info(data: string) {
+  let url = `${api.value}api/auth/monkey/save_site`
   return new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
-      url: `${api.value}api/monkey/save_site/${token.value}`, method: "POST", // responseType: "json",
-      headers: {"Content-Type": "application/x-www-form-urlencoded"}, data: data, onload: function (response) {
+      url: url,
+      method: "POST", // responseType: "json",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: data,
+      onload: function (response) {
         console.log(response)
         let res = JSON.parse(response.response)
         console.log(res)
@@ -353,7 +369,7 @@ function xpath(query: string, node: Node) {
 const torrents = ref<any>([])
 
 async function get_torrent_list() {
-  let o = sessionStorage.getItem('ptools')
+  let o = sessionStorage.getItem('website')
   if (!o) {
     await getSite()
   }
@@ -426,7 +442,7 @@ async function get_torrent_list() {
  */
 async function get_torrent_detail() {
   torrents.value.length = 0
-  let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
+  let site_info = JSON.parse(sessionStorage.getItem('website')!);
   let title = xpath(site_info.detail_title_rule, document).snapshotItem(0)
   let subtitle = xpath(site_info.detail_subtitle_rule, document).snapshotItem(0)
   let magnet_url = xpath(site_info.detail_download_url_rule, document).snapshotItem(0)
@@ -474,9 +490,11 @@ async function get_torrent_detail() {
  */
 async function getDownloaders() {
   GM_xmlhttpRequest({
-    url: `${api.value}api/download/downloaders`, method: "GET", responseType: "json", headers: {
-      Authorization: token.value
-    }, onload: function (response) {
+    url: `${api.value}api/option/downloaders`, method: "GET", responseType: "json",
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+    },
+    onload: function (response) {
       let res = response.response
       console.log(res)
       if (res.code !== 0) {
@@ -494,11 +512,11 @@ async function getDownloaders() {
  */
 const test_connect = async (downloader_id: number) => {
   GM_xmlhttpRequest({
-    url: `${api.value}api/download/downloader/test?downloader_id=${downloader_id}`,
+    url: `${api.value}api/option/downloaders/test/${downloader_id}`,
     method: "GET",
     responseType: "json",
     headers: {
-      Authorization: token.value
+      Authorization: `Bearer ${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -522,11 +540,11 @@ async function getDownloaderCategorise(downloader_id: number) {
   }
   await test_connect(downloader_id)
   GM_xmlhttpRequest({
-    url: `${api.value}api/download/downloaders/categories?downloader_id=${downloader_id}`,
+    url: `${api.value}api/option/downloaders/categories/${downloader_id}`,
     method: "GET",
     responseType: "json",
     headers: {
-      Authorization: token.value
+      Authorization: `Bearer ${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -568,17 +586,33 @@ const generate_magnet_url = async (flag: boolean) => {
  * 推送种子到下载器
  */
 const push_torrent = async (downloader_id: number, category: string) => {
-  let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
+  let mySiteId = sessionStorage.getItem('mySite');
   await generate_magnet_url(true)
   console.log(url_list.value)
-  let data = `site=${site_info.id}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join('|')}`
+  if (url_list.value.length <= 0) {
+    message.error('没有抓去到种子链接！')
+    return
+  }
+  let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join('|')}`
   // message.warning(data)
   GM_xmlhttpRequest({
-    url: `${api.value}api/mysite/push_torrent?${data}`, method: "GET", responseType: "json", headers: {
-      Authorization: token.value
+    url: `${api.value}api/option/push_torrent?${data}`,
+    method: "GET",
+    responseType: "json",
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+    },
+    onload: function (response) {
+      let res = response.response
+      console.log(res)
+      if (!res || res.code !== 0) {
+        message.error(res.msg)
+      } else {
+        categories.value = res.data
+      }
     }
   })
-  message.success('种子已推送，请检查下载器！')
+  // message.success('种子已推送，请检查下载器！')
   open.value = false
 }
 
@@ -591,7 +625,9 @@ const sync_torrents = async () => {
     url: `${api.value}api/monkey/parse_torrents`,
     method: "POST",
     // responseType: "json",
-    headers: {"Content-Type": "application/json"},
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+    },
     data: JSON.stringify(torrents.value),
     onload: function (response) {
       console.log(response.response)
@@ -616,13 +652,13 @@ const sync_torrents = async () => {
  */
 async function repeat(hash_string: string) {
 
-  let site_info = JSON.parse(sessionStorage.getItem('ptools')!);
+  let site_info = JSON.parse(sessionStorage.getItem('website')!);
   GM_xmlhttpRequest({
     url: `${api.value}api/monkey/torrents/iyuu`, method: "POST",
     responseType: "json",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: token.value
+      Authorization: `Bearer ${token.value}`,
     },
     data: `hash_string=${hash_string}&site_id=${site_info.id}`,
     onload: function (response) {
@@ -680,7 +716,7 @@ onBeforeMount(async () => {
 
   // 只加载一次
   while (init.value < 1) {
-    if (!sessionStorage.getItem('ptools')) {
+    if (!sessionStorage.getItem('website')) {
       await getSite()
     }
     await getDownloaders()
@@ -692,7 +728,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="wrap">
+  <div class="ptools-wrap">
     <a-image
         :preview="false"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
@@ -907,7 +943,7 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-.wrap {
+.ptools-wrap {
   position: fixed;
   top: 0;
   z-index: 99999;
@@ -921,11 +957,11 @@ onBeforeMount(async () => {
   background-color: #fff;
 }
 
-.wrap:hover {
+.ptools-wrap:hover {
   opacity: 1.0;
 }
 
-.wrap > img, .image {
+.ptools-wrap > img, .image {
   border-radius: 2px;
   width: 100%;
 }
