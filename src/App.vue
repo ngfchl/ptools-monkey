@@ -734,7 +734,7 @@ onBeforeMount(async () => {
     <a-image
         :preview="false"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
-        :fallback="`${api}splash/img/light-1x.png`"
+        :fallback="`${api}favicon.png`"
         class="image"/>
     <a-space
         align="center"
@@ -896,7 +896,7 @@ onBeforeMount(async () => {
         }"
     >
       <template #extra>
-        <a-avatar :src="`${api}splash/img/light-1x.png`">
+        <a-avatar :src="`${api}favicon.png`">
           辅种助手
         </a-avatar>
       </template>
@@ -915,7 +915,7 @@ onBeforeMount(async () => {
               <a-image
                   :preview="false"
                   :src="info.site.logo" :width="13"
-                  :fallback="`${api}splash/img/light-1x.png`"
+                  :fallback="`${api}favicon.png`"
               ></a-image>
             </template>
             {{ info.site.name }}
@@ -933,7 +933,7 @@ onBeforeMount(async () => {
             <template #icon>
               <a-image
                   :src="site.logo" :width="13"
-                  :fallback="`${api}splash/img/light-1x.png`"
+                  :fallback="`${api}favicon.png`"
               ></a-image>
             </template>
             {{ site.name }}
