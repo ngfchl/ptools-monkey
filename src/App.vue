@@ -10,7 +10,7 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons-vue'
 
-const api = ref('http://192.168.123.5:28000/')
+const api = ref('http://192.168.123.5:28080/')
 // const api = ref('http://127.0.0.1:8080/')
 const token = ref('ptools')
 const drawer = ref(false)
@@ -127,7 +127,7 @@ async function init_button() {
     console.log('当前为种子详情页')
     torrent_detail_page.value = true
     await get_torrent_detail()
-    await sync_torrents()
+    // await sync_torrents()
     let hash_string = torrents.value[0].hash_string
     console.log(hash_string)
     if (!hash_string) {
@@ -148,10 +148,11 @@ async function init_button() {
     console.log('当前为种子列表页')
     torrent_list_page.value = true
     await get_torrent_list()
-    await sync_torrents()
+    // await sync_torrents()
   }
   if (location.pathname.startsWith('/userdetails') ||
       location.href.includes('/user.php?id=') ||
+      location.href.includes('/p_user/user_detail.php') ||
       location.href.includes('/user.php?u=') ||
       location.href.includes('/index.php?page=usercp&uid=') ||
       location.href.includes('/Users/profile?uid=') ||
@@ -162,6 +163,7 @@ async function init_button() {
     await sync_cookie()
   }
   if (location.pathname.search(/usercp.php/) > 0 ||
+      location.href.includes('p_user/edit_passkey') ||
       location.href.includes('/index.php?page=usercp&do=pid_c&action=change&uid=') ||
       location.href.includes('/Users/me') ||
       location.href.includes('/my.php')
@@ -654,13 +656,13 @@ async function repeat(hash_string: string) {
 
   let site_info = JSON.parse(sessionStorage.getItem('website')!);
   GM_xmlhttpRequest({
-    url: `${api.value}api/monkey/torrents/iyuu`, method: "POST",
+    url: `${api.value}api/auth/monkey/iyuu`, method: "POST",
     responseType: "json",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Bearer ${token.value}`,
     },
-    data: `hash_string=${hash_string}&site_id=${site_info.id}`,
+    data: `hash_string=${hash_string}&site=${site_info.name}`,
     onload: function (response) {
       let res = response.response
       console.log(res)
@@ -732,7 +734,7 @@ onBeforeMount(async () => {
     <a-image
         :preview="false"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
-        :fallback="`${api}ptools.svg`"
+        :fallback="`${api}splash/img/light-1x.png`"
         class="image"/>
     <a-space
         align="center"
@@ -747,7 +749,7 @@ onBeforeMount(async () => {
           <template #icon>
             <ThunderboltOutlined/>
           </template>
-          PTools
+          收割机
         </a-button>
         <a-button
             size="small" block type="primary"
@@ -894,7 +896,7 @@ onBeforeMount(async () => {
         }"
     >
       <template #extra>
-        <a-avatar :src="`${api}ptools.svg`">
+        <a-avatar :src="`${api}splash/img/light-1x.png`">
           辅种助手
         </a-avatar>
       </template>
@@ -913,7 +915,7 @@ onBeforeMount(async () => {
               <a-image
                   :preview="false"
                   :src="info.site.logo" :width="13"
-                  :fallback="`${api}ptools.svg`"
+                  :fallback="`${api}splash/img/light-1x.png`"
               ></a-image>
             </template>
             {{ info.site.name }}
@@ -931,7 +933,7 @@ onBeforeMount(async () => {
             <template #icon>
               <a-image
                   :src="site.logo" :width="13"
-                  :fallback="`${api}ptools.svg`"
+                  :fallback="`${api}splash/img/light-1x.png`"
               ></a-image>
             </template>
             {{ site.name }}
