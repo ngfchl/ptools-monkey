@@ -1,0 +1,42 @@
+name: Build Harvest Monkey Helper
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ptools:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      -
+        name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - 
+        name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+        with:
+          version: 6.32.9
+
+      -
+        name: Build Web
+        run: |
+          pnpm install
+          pnpm build
+          ls -al
+          ls -al dist
+
+      - name: Deploy to dist branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: dist
