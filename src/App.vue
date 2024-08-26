@@ -272,9 +272,10 @@ async function getSiteData() {
     data += `&nickname=${site_info.name}`
   }
   let passkey = getPasskey()
-  console.log(passkey)
-  data += `&passkey=${passkey == false ? null : passkey}`
-
+  if (passkey != false){
+    console.log(passkey)
+    data += `&passkey=${passkey}`
+  }
   let time_join = getTimeJoin()
   console.log(time_join)
   if (time_join != false) {
