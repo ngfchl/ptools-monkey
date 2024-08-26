@@ -11,7 +11,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "~4.0.8",
-    "vue": "^3.4.34"
+    "vue": "^3.4.38"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.6.2",
