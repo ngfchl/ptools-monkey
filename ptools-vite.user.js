@@ -12,7 +12,6 @@
 // @match        https://pt.gtk.pw/*
 // @match        https://hdsky.me/*
 // @match        https://u2.dmhy.org/*
-// @match        https://www.haidan.video/*
 // @match        https://ssdforum.org/*
 // @match        https://www.tjupt.org/*
 // @match        https://tjupt.org/*
@@ -134,11 +133,11 @@
 // @match        https://audiences.me/*
 // @match        https://reelflix.xyz/*
 // @match        https://www.ptlsp.com/*
-// @match        https://zhuque.in/*
 // @match        https://hdarea.club/*
 // @match        http://pt.tu88.men/*
 // @match        https://avistaz.to/*
-// @require      https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js
+// @match        https://pt.zhuoyue.de/*
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.5/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
 // @grant        GM_xmlhttpRequest
@@ -155,7 +154,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-909315df.js"(exports, module) {
+    "main-3d6604f7.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -29874,7 +29873,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(ThunderboltOutlined$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 收割机 ")
+                          _cache[4] || (_cache[4] = vue.createTextVNode(" 收割机 "))
                         ]),
                         _: 1
                       }, 8, ["href"]),
@@ -29889,7 +29888,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(SyncOutlined$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 同步数据 ")
+                          _cache[5] || (_cache[5] = vue.createTextVNode(" 同步数据 "))
                         ]),
                         _: 1
                       })) : vue.createCommentVNode("", true),
@@ -29903,7 +29902,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(ArrowDownOutlined$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 下载全部 ")
+                          _cache[6] || (_cache[6] = vue.createTextVNode(" 下载全部 "))
                         ]),
                         _: 1
                       })) : vue.createCommentVNode("", true),
@@ -29917,7 +29916,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(DownloadOutlined$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 下载免费 ")
+                          _cache[7] || (_cache[7] = vue.createTextVNode(" 下载免费 "))
                         ]),
                         _: 1
                       })) : vue.createCommentVNode("", true),
@@ -29931,7 +29930,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(DownloadOutlined$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 下载到... ")
+                          _cache[8] || (_cache[8] = vue.createTextVNode(" 下载到... "))
                         ]),
                         _: 1
                       })) : vue.createCommentVNode("", true),
@@ -29945,7 +29944,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                           vue.createVNode(vue.unref(PushpinFilled$1))
                         ]),
                         default: vue.withCtx(() => [
-                          vue.createTextVNode(" 辅种助手 ")
+                          _cache[9] || (_cache[9] = vue.createTextVNode(" 辅种助手 "))
                         ]),
                         _: 1
                       })) : vue.createCommentVNode("", true)
@@ -29999,9 +29998,9 @@ summary tabindex target title type usemap value width wmode wrap`;
                                   ghost: "",
                                   onClick: ($event) => push_torrent(d2.id, "")
                                 }, {
-                                  default: vue.withCtx(() => [
+                                  default: vue.withCtx(() => _cache[10] || (_cache[10] = [
                                     vue.createTextVNode(" 未分类 ")
-                                  ]),
+                                  ])),
                                   _: 2
                                 }, 1032, ["onClick"])) : vue.createCommentVNode("", true),
                                 (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(categories.value, (c2) => {
@@ -30045,9 +30044,9 @@ summary tabindex target title type usemap value width wmode wrap`;
                   vue.createVNode(_component_a_avatar, {
                     src: `${api2.value}favicon.png`
                   }, {
-                    default: vue.withCtx(() => [
+                    default: vue.withCtx(() => _cache[11] || (_cache[11] = [
                       vue.createTextVNode(" 辅种助手 ")
-                    ]),
+                    ])),
                     _: 1
                   }, 8, ["src"])
                 ]),
