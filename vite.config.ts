@@ -161,6 +161,8 @@ export default defineConfig({
                     'http://pt.tu88.men/*',
                     'https://avistaz.to/*',
                     'https://pt.zhuoyue.de/*',
+                    'https://raingfh.top/*',
+                    'https://ptzone.xyz/*',
                 ],
             },
             build: {
