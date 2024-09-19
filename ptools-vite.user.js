@@ -137,7 +137,9 @@
 // @match        http://pt.tu88.men/*
 // @match        https://avistaz.to/*
 // @match        https://pt.zhuoyue.de/*
-// @require      https://cdn.jsdelivr.net/npm/vue@3.5.5/dist/vue.global.prod.js
+// @match        https://raingfh.top/*
+// @match        https://ptzone.xyz/*
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.6/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
 // @grant        GM_xmlhttpRequest
