@@ -139,6 +139,7 @@
 // @match        https://pt.zhuoyue.de/*
 // @match        https://raingfh.top/*
 // @match        https://ptzone.xyz/*
+// @match        https://ptlgs.org/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.6/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
