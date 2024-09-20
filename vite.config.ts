@@ -163,6 +163,7 @@ export default defineConfig({
                     'https://pt.zhuoyue.de/*',
                     'https://raingfh.top/*',
                     'https://ptzone.xyz/*',
+                    'https://ptlgs.org/*',
                 ],
             },
             build: {
