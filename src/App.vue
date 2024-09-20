@@ -596,7 +596,7 @@ const push_torrent = async (downloader_id: number, category: string) => {
     message.error('没有抓去到种子链接！')
     return
   }
-  let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join('|')}`
+  let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(',')}`
   // message.warning(data)
   GM_xmlhttpRequest({
     url: `${api.value}api/option/push_torrent?${data}`,
@@ -612,10 +612,10 @@ const push_torrent = async (downloader_id: number, category: string) => {
         message.error(res.msg)
       } else {
         categories.value = res.data
+        message.success(`种子已推送，请检查下载器！${res.msg}`)
       }
     }
   })
-  // message.success('种子已推送，请检查下载器！')
   open.value = false
 }
 
