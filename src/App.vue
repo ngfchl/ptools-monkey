@@ -1,19 +1,20 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {onBeforeMount, ref} from "vue";
-import {GM_cookie, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
+import {GM_cookie, GM_getValue, GM_setValue, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
 import {message} from "ant-design-vue"
 import {
   ArrowDownOutlined,
-  SyncOutlined,
   DownloadOutlined,
   PushpinFilled,
+  SyncOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons-vue'
 
-const api = ref('http://192.168.123.5:28080/')
+const api = ref('')
 // const api = ref('http://127.0.0.1:8080/')
-const token = ref('ptools')
+const token = ref('harvest')
 const drawer = ref(false)
+const init_modal = ref(false)
 const repeat_info = ref<RepeatInfo>({
   url_list: [],
   can_list: []
@@ -179,10 +180,18 @@ async function init_button() {
  * @returns {Promise<unknown>}
  */
 async function getSite() {
+  console.log(api.value)
   const path = "api/auth/monkey/get_site/"
   return new Promise((resolve, reject) => {
+    let host = document.location.host;
+
+    if (host.includes("m-team")) {
+      host = host.replace("xp.", "api.")
+      host = host.replace("kp.", "api.")
+    }
+
     GM_xmlhttpRequest({
-      url: `${api.value}${path}${document.location.host}`,
+      url: `${api.value}${path}${host}`,
       method: "GET",
       responseType: "json",
       headers: {
@@ -246,7 +255,7 @@ async function getSiteData() {
   //获取cookie与useragent
   let user_agent = window.navigator.userAgent
   let cookie = await getCookie()
-  if (!cookie) {
+  if (!cookie && !document.location.host.includes("m-team")) {
     message.error('Cookie获取失败，请使用Beta版油猴（红色图标的油猴）！')
     return false
   }
@@ -258,6 +267,12 @@ async function getSiteData() {
     return false
   }
   let user_id_info = href.split('=')
+  if (href.includes("=")) {
+    user_id_info = href.split('=')
+  }
+  if (href.includes("/")) {
+    user_id_info = href.split('/')
+  }
   let user_id = user_id_info[user_id_info.length - 1].trim()
   console.log(user_id)
   if (!user_id) {
@@ -272,7 +287,7 @@ async function getSiteData() {
     data += `&nickname=${site_info.name}`
   }
   let passkey = getPasskey()
-  if (passkey != false){
+  if (passkey != false) {
     console.log(passkey)
     data += `&passkey=${passkey}`
   }
@@ -712,11 +727,35 @@ async function download_free() {
 //   message.info('copy_all！', 2)
 // }
 
+function checkServer() {
+  api.value = GM_getValue("harvest_api", "")
+  token.value = GM_getValue("harvest_token", "ptools")
+  console.log(api.value)
+  if (!api.value) {
+    showInitModal()
+    return false
+  }
+  return true
+}
+
+const showInitModal = () => {
+  init_modal.value = true
+}
+
+const handleSaveServer = () => {
+  if (!api.value.endsWith("/")) {
+    api.value = `${api.value}/`
+  }
+  GM_setValue("harvest_api", api.value)
+  GM_setValue("harvest_token", token.value)
+  init_modal.value = false
+  location.reload()
+}
 const init = ref(0)
 onBeforeMount(async () => {
   // 最顶层才加载
   if (window.top != window.self) return;
-
+  if (!checkServer()) return;
   // 只加载一次
   while (init.value < 1) {
     if (!sessionStorage.getItem('website')) {
@@ -733,19 +772,19 @@ onBeforeMount(async () => {
 <template>
   <div class="ptools-wrap">
     <a-image
-        :preview="false"
-        src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"
         :fallback="`${api}favicon.png`"
-        class="image"/>
+        :preview="false"
+        class="image"
+        src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E7%8C%AB%E5%A8%981"/>
     <a-space
         align="center"
         style="width: 100%;"
     >
       <a-space-compact direction="vertical">
         <a-button
-            danger type="link"
-            block style="width: 110px;"
-            :href="api" target="_blank"
+            block danger
+            style="width: 110px;" type="link"
+            @click="showInitModal"
         >
           <template #icon>
             <ThunderboltOutlined/>
@@ -753,17 +792,17 @@ onBeforeMount(async () => {
           收割机
         </a-button>
         <a-button
-            size="small" block type="primary"
-            @click="sync_cookie"
-            v-if="user_detail_page">
+            v-if="user_detail_page" block size="small"
+            type="primary"
+            @click="sync_cookie">
           <template #icon>
             <SyncOutlined/>
           </template>
           同步数据
         </a-button>
         <a-button
-            size="small" block
-            v-if="torrent_list_page"
+            v-if="torrent_list_page" block
+            size="small"
             @click="download_all"
         >
           <template #icon>
@@ -772,8 +811,8 @@ onBeforeMount(async () => {
           下载全部
         </a-button>
         <a-button
-            size="small" block
-            v-if="torrent_list_page"
+            v-if="torrent_list_page" block
+            size="small"
             @click="download_free"
         >
           <template #icon>
@@ -822,18 +861,18 @@ onBeforeMount(async () => {
         <!--          复制链接-->
         <!--        </a-button>-->
         <a-button
-            size="small" block
-            @click="download_to"
-            v-if="torrent_detail_page">
+            v-if="torrent_detail_page" block
+            size="small"
+            @click="download_to">
           <template #icon>
             <DownloadOutlined/>
           </template>
           下载到...
         </a-button>
         <a-button
-            size="small" block
-            @click="drawer = true"
-            v-if="torrent_detail_repeat">
+            v-if="torrent_detail_repeat" block
+            size="small"
+            @click="drawer = true">
           <template #icon>
             <PushpinFilled/>
           </template>
@@ -851,10 +890,10 @@ onBeforeMount(async () => {
     <a-modal v-model:open="open" :title="modal_title" @ok="handleOk">
       <a-collapse
           v-model:activeKey="activeKey"
-          accordion
-          style="background: rgb(255, 255, 255)"
-          expand-icon-position="end"
           :bordered="false"
+          accordion
+          expand-icon-position="end"
+          style="background: rgb(255, 255, 255)"
           @change="getDownloaderCategorise">
         <a-collapse-panel v-for="d in downloaders" :key="d.id" style="font-size: 16px;">
           <template #header>
@@ -867,20 +906,20 @@ onBeforeMount(async () => {
             <!--                :src="d.category === 'Qb' ? `${api}images/qb32.png` : `${api}images/tr.png`"/>-->
             <span style="margin-left: 3px;">{{ d.name }}</span>
           </template>
-          <a-space wrap align="center">
+          <a-space align="center" wrap>
             <a-button
-                type="primary"
-                size="small"
-                ghost
                 v-if="d.category === 'Qb'"
+                ghost
+                size="small"
+                type="primary"
                 @click="push_torrent(d.id, '')"
             >
               未分类
             </a-button>
             <a-button
-                type="primary"
-                size="small"
-                ghost v-for="c in categories"
+                v-for="c in categories"
+                ghost
+                size="small" type="primary"
                 @click="push_torrent(d.id, c.name)"
             >
               {{ c.name }}
@@ -889,34 +928,54 @@ onBeforeMount(async () => {
         </a-collapse-panel>
       </a-collapse>
     </a-modal>
+    <a-modal v-model:open="init_modal" :footer="null" cancel-text="取消"
+             ok-text="保存" style="width: 350px;margin: auto" title="请填写Harvest服务器地址" @ok="handleSaveServer">
+      <a-form layout="vertical" style="margin: auto;">
+        <a-form-item
+            label="Harvest">
+          <a-input-group compact>
+            <a-input v-model:value="api" placeholder="Harvest服务器地址" style="width: 220px;"/>
+            <a-button :href="api" danger style="width: 80px;" target="_blank" type="dashed">打开
+            </a-button>
+          </a-input-group>
+        </a-form-item>
+        <a-form-item
+            label="Token">
+          <a-input v-model:value.lazy="token" autofocus label="Token" placeholder="安全Token" style="width: 300px;"/>
+        </a-form-item>
+        <a-form-item>
+          <a-button style="width: 100%;" type="primary" @click="handleSaveServer">保存</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <a-drawer
-        :width="400" title="辅种助手" :zIndex="10001"
-        placement="right" :open="drawer" @close="drawer=!drawer"
         :bodyStyle="{
           padding:0
-        }"
+        }" :open="drawer" :width="400"
+        :zIndex="10001" placement="right" title="辅种助手"
+        @close="drawer=!drawer"
     >
       <template #extra>
         <a-avatar :src="`${api}favicon.png`">
           辅种助手
         </a-avatar>
       </template>
-      <a-card title="可辅种站点" style="width: 100%">
-        <a-space wrap align="center">
+      <a-card style="width: 100%" title="可辅种站点">
+        <a-space align="center" wrap>
           <a-button
               v-for="info in repeat_info!.url_list"
-              type="primary"
+              :key="info.site.id"
+              :href="info.details_url"
               ghost
               size="small"
-              :href="info.details_url"
               target="_blank"
-              :key="info.site.id"
+              type="primary"
           >
             <template #icon>
               <a-image
-                  :preview="false"
-                  :src="info.site.logo" :width="13"
-                  :fallback="`${api}favicon.png`"
+                  :fallback="`${api}${info.site.logo}`"
+                  :preview="false" :src="info.site.logo"
+                  :width="13"
               ></a-image>
             </template>
             {{ info.site.name }}
@@ -924,17 +983,17 @@ onBeforeMount(async () => {
         </a-space>
       </a-card>
       <a-card title="可发布站点">
-        <a-space wrap align="center">
+        <a-space align="center" wrap>
           <a-button
-              size="small"
-              danger ghost
-              :href="site.url"
-              target="_blank"
-              v-for="site in repeat_info!.can_list" :key="site.id">
+              v-for="site in repeat_info!.can_list"
+              :key="site.id" :href="site.url"
+              danger
+              ghost
+              size="small" target="_blank">
             <template #icon>
               <a-image
-                  :src="site.logo" :width="13"
-                  :fallback="`${api}favicon.png`"
+                  :fallback="`${api}favicon.png`" :src="site.logo"
+                  :width="13"
               ></a-image>
             </template>
             {{ site.name }}
