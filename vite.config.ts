@@ -106,8 +106,8 @@ export default defineConfig({
                     'https://t.tosky.club/*',
                     'https://ptchdbits.co/*',
                     'https://springsunday.net/*',
-                    'https://api.m-team.cc/*',
-                    'https://api.m-team.io/*',
+                    'https://*.m-team.cc/*',
+                    'https://*.m-team.io/*',
                     'https://nanyangpt.com/*',
                     'https://club.hares.top/*',
                     'https://ptfans.cc/*',
@@ -164,6 +164,7 @@ export default defineConfig({
                     'https://raingfh.top/*',
                     'https://ptzone.xyz/*',
                     'https://ptlgs.org/*',
+                    'https://pt.ghacg.com/*',
                 ],
             },
             build: {
