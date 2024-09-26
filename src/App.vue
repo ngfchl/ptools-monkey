@@ -266,11 +266,10 @@ async function getSiteData() {
     console.log('获取 UID 出错啦！')
     return false
   }
-  let user_id_info = href.split('=')
+  let user_id_info;
   if (href.includes("=")) {
     user_id_info = href.split('=')
-  }
-  if (href.includes("/")) {
+  } else {
     user_id_info = href.split('/')
   }
   let user_id = user_id_info[user_id_info.length - 1].trim()
