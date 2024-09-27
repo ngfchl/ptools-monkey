@@ -89,7 +89,7 @@ const categories = ref<Category[]>([])
 const cookie = ref<string>('')
 const url_list = ref<string[]>([])
 const modal_title = ref<string>('下载到')
-
+const singleTorrent = ref<Torrent>(null)
 const showModal = () => {
   if (downloaders.value.length <= 0) {
     message.warning('没有可用的下载器！请先在收割机中添加！')
@@ -695,6 +695,8 @@ async function repeat(hash_string: string) {
 
 async function download_to() {
   await get_torrent_detail()
+  console.log(torrents.value)
+  singleTorrent.value = torrents.value[0]
   await generate_magnet_url(false)
   modal_title.value = '正在下载当前种子...'
   showModal()
@@ -891,6 +893,10 @@ onBeforeMount(async () => {
       <!--      </a-space-compact>-->
     </a-space>
     <a-modal v-model:open="open" :title="modal_title" @ok="handleOk">
+      <a-descriptions :column="1" :title="singleTorrent.subtitle" bordered size="small">
+        <a-descriptions-item><span v-text="singleTorrent.title"></span></a-descriptions-item>
+        <a-descriptions-item><span v-text="singleTorrent.magnet_url"></span></a-descriptions-item>
+      </a-descriptions>
       <a-collapse
           v-model:activeKey="activeKey"
           :bordered="false"
