@@ -893,10 +893,9 @@ onBeforeMount(async () => {
       <!--      </a-space-compact>-->
     </a-space>
     <a-modal v-model:open="open" :title="modal_title" @ok="handleOk">
-      <a-descriptions :column="1" :title="singleTorrent.subtitle" bordered size="small">
-        <a-descriptions-item><span v-text="singleTorrent.title"></span></a-descriptions-item>
-        <a-descriptions-item><span v-text="singleTorrent.magnet_url"></span></a-descriptions-item>
-      </a-descriptions>
+      <a-tooltip :title="singleTorrent.magnet_url">
+        <a-alert :message="singleTorrent.title"></a-alert>
+      </a-tooltip>
       <a-collapse
           v-model:activeKey="activeKey"
           :bordered="false"
