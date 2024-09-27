@@ -162,7 +162,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-dcc325ca.js"(exports, module) {
+    "main-ea314697.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -1006,6 +1006,23 @@
           props2 = _extends$1(_extends$1({}, props2), ele.props);
         }
         return splitAttrs(props2)[on ? "onEvents" : "events"];
+      }
+      function getClass(ele) {
+        const props2 = (vue.isVNode(ele) ? ele.props : ele.$attrs) || {};
+        const tempCls = props2.class || {};
+        let cls = {};
+        if (typeof tempCls === "string") {
+          tempCls.split(" ").forEach((c2) => {
+            cls[c2.trim()] = true;
+          });
+        } else if (Array.isArray(tempCls)) {
+          classNames(tempCls).split(" ").forEach((c2) => {
+            cls[c2.trim()] = true;
+          });
+        } else {
+          cls = _extends$1(_extends$1({}, cls), tempCls);
+        }
+        return cls;
       }
       function getStyle$1(ele, camel) {
         const props2 = (vue.isVNode(ele) ? ele.props : ele.$attrs) || {};
@@ -4963,7 +4980,7 @@
           }
         };
       };
-      const useStyle$k = genComponentStyleHook("Empty", (token2) => {
+      const useStyle$l = genComponentStyleHook("Empty", (token2) => {
         const {
           componentCls,
           controlHeightLG
@@ -5012,7 +5029,7 @@
             direction,
             prefixCls: prefixClsRef
           } = useConfigInject("empty", props2);
-          const [wrapSSR, hashId] = useStyle$k(prefixClsRef);
+          const [wrapSSR, hashId] = useStyle$l(prefixClsRef);
           return () => {
             var _a, _b;
             const prefixCls = prefixClsRef.value;
@@ -11206,7 +11223,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$j = genComponentStyleHook("Space", (token2) => [genSpaceStyle(token2), genSpaceCompactStyle$1(token2)]);
+      const useStyle$k = genComponentStyleHook("Space", (token2) => [genSpaceStyle(token2), genSpaceCompactStyle$1(token2)]);
       var symbolTag$2 = "[object Symbol]";
       function isSymbol(value) {
         return typeof value == "symbol" || isObjectLike(value) && baseGetTag(value) == symbolTag$2;
@@ -12354,7 +12371,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             direction: directionConfig
           } = useConfigInject("space-compact", props2);
           const compactItemContext = SpaceCompactItemContext.useInject();
-          const [wrapSSR, hashId] = useStyle$j(prefixCls);
+          const [wrapSSR, hashId] = useStyle$k(prefixCls);
           const clx = vue.computed(() => {
             return classNames(prefixCls.value, hashId.value, {
               [`${prefixCls.value}-rtl`]: directionConfig.value === "rtl",
@@ -13285,7 +13302,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$i = genComponentStyleHook("Avatar", (token2) => {
+      const useStyle$j = genComponentStyleHook("Avatar", (token2) => {
         const {
           colorTextLightSolid,
           colorTextPlaceholder
@@ -13373,7 +13390,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("avatar", props2);
-          const [wrapSSR, hashId] = useStyle$i(prefixCls);
+          const [wrapSSR, hashId] = useStyle$j(prefixCls);
           const avatarCtx = useAvatarInjectContext();
           const size = vue.computed(() => {
             return props2.size === "default" ? avatarCtx.size : props2.size;
@@ -14218,7 +14235,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         ];
       };
-      const useStyle$h = (prefixCls, injectStyle) => {
+      const useStyle$i = (prefixCls, injectStyle) => {
         const useOriginHook = genComponentStyleHook("Tooltip", (token2) => {
           if ((injectStyle === null || injectStyle === void 0 ? void 0 : injectStyle.value) === false) {
             return [];
@@ -14421,7 +14438,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
           const colorInfo = vue.computed(() => parseColor(prefixCls.value, props2.color));
           const injectFromPopover = vue.computed(() => attrs["data-popover-inject"]);
-          const [wrapSSR, hashId] = useStyle$h(prefixCls, vue.computed(() => !injectFromPopover.value));
+          const [wrapSSR, hashId] = useStyle$i(prefixCls, vue.computed(() => !injectFromPopover.value));
           return () => {
             var _a, _b;
             const {
@@ -14603,7 +14620,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$g = genComponentStyleHook("Popover", (token2) => {
+      const useStyle$h = genComponentStyleHook("Popover", (token2) => {
         const {
           colorBgElevated,
           colorText,
@@ -14659,7 +14676,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             prefixCls,
             configProvider
           } = useConfigInject("popover", props2);
-          const [wrapSSR, hashId] = useStyle$g(prefixCls);
+          const [wrapSSR, hashId] = useStyle$h(prefixCls);
           const rootPrefixCls = vue.computed(() => configProvider.getPrefixCls());
           const getOverlay = () => {
             var _a, _b;
@@ -14735,7 +14752,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             direction
           } = useConfigInject("avatar", props2);
           const groupPrefixCls = vue.computed(() => `${prefixCls.value}-group`);
-          const [wrapSSR, hashId] = useStyle$i(prefixCls);
+          const [wrapSSR, hashId] = useStyle$j(prefixCls);
           vue.watchEffect(() => {
             const context2 = {
               size: props2.size,
@@ -15028,7 +15045,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$f = genComponentStyleHook("Wave", (token2) => [genWaveStyle(token2)]);
+      const useStyle$g = genComponentStyleHook("Wave", (token2) => [genWaveStyle(token2)]);
       function isNotGrey(color) {
         const match2 = (color || "").match(/rgba?\((\d*), (\d*), (\d*)(, [\d.]*)?\)/);
         if (match2 && match2[1] && match2[2] && match2[3]) {
@@ -15212,7 +15229,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             prefixCls,
             wave
           } = useConfigInject("wave", props2);
-          const [, hashId] = useStyle$f(prefixCls);
+          const [, hashId] = useStyle$g(prefixCls);
           const showWave = useWave(instance, vue.computed(() => classNames(prefixCls.value, hashId.value)), wave);
           let onClick;
           const clear = () => {
@@ -15799,7 +15816,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$e = genComponentStyleHook("Button", (token2) => {
+      const useStyle$f = genComponentStyleHook("Button", (token2) => {
         const {
           controlTmpOutline,
           paddingContentHorizontal
@@ -15916,7 +15933,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             direction,
             size
           } = useConfigInject("btn", props2);
-          const [wrapSSR, hashId] = useStyle$e(prefixCls);
+          const [wrapSSR, hashId] = useStyle$f(prefixCls);
           const groupSizeContext = GroupSizeContext.useInject();
           const disabledContext = useInjectDisabled();
           const mergedDisabled = vue.computed(() => {
@@ -17997,7 +18014,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         ];
       };
-      const useStyle$d = (prefixCls, injectStyle) => {
+      const useStyle$e = (prefixCls, injectStyle) => {
         const useOriginHook = genComponentStyleHook("Menu", (token2, _ref) => {
           let {
             overrideComponentToken
@@ -18208,7 +18225,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             var _a;
             return getPrefixCls("menu", props2.prefixCls || ((_a = override === null || override === void 0 ? void 0 : override.prefixCls) === null || _a === void 0 ? void 0 : _a.value));
           });
-          const [wrapSSR, hashId] = useStyle$d(prefixCls, vue.computed(() => {
+          const [wrapSSR, hashId] = useStyle$e(prefixCls, vue.computed(() => {
             return !override;
           }));
           const store = vue.shallowRef(/* @__PURE__ */ new Map());
@@ -19338,7 +19355,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$c = genComponentStyleHook("Input", (token2) => {
+      const useStyle$d = genComponentStyleHook("Input", (token2) => {
         const inputToken = initInputToken(token2);
         return [
           genInputStyle(inputToken),
@@ -21391,7 +21408,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$b = genComponentStyleHook("Tabs", (token2) => {
+      const useStyle$c = genComponentStyleHook("Tabs", (token2) => {
         const tabsCardHeight = token2.controlHeightLG;
         const tabsToken = merge(token2, {
           tabsHoverColor: token2.colorPrimaryHover,
@@ -21520,7 +21537,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             rootPrefixCls,
             getPopupContainer
           } = useConfigInject("tabs", props2);
-          const [wrapSSR, hashId] = useStyle$b(prefixCls);
+          const [wrapSSR, hashId] = useStyle$c(prefixCls);
           const rtl2 = vue.computed(() => direction.value === "rtl");
           const mergedAnimated = vue.computed(() => {
             const {
@@ -22107,7 +22124,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$a = genComponentStyleHook("Card", (token2) => {
+      const useStyle$b = genComponentStyleHook("Card", (token2) => {
         const cardToken = merge(token2, {
           cardShadow: token2.boxShadowCard,
           cardHeadHeight: token2.fontSizeLG * token2.lineHeightLG + token2.padding * 2,
@@ -22517,7 +22534,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$9 = genComponentStyleHook("Skeleton", (token2) => {
+      const useStyle$a = genComponentStyleHook("Skeleton", (token2) => {
         const {
           componentCls
         } = token2;
@@ -22636,7 +22653,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             prefixCls,
             direction
           } = useConfigInject("skeleton", props2);
-          const [wrapSSR, hashId] = useStyle$9(prefixCls);
+          const [wrapSSR, hashId] = useStyle$a(prefixCls);
           return () => {
             var _a;
             const {
@@ -22715,7 +22732,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("skeleton", props2);
-          const [wrapSSR, hashId] = useStyle$9(prefixCls);
+          const [wrapSSR, hashId] = useStyle$a(prefixCls);
           const cls = vue.computed(() => classNames(prefixCls.value, `${prefixCls.value}-element`, {
             [`${prefixCls.value}-active`]: props2.active,
             [`${prefixCls.value}-block`]: props2.block
@@ -22743,7 +22760,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("skeleton", props2);
-          const [wrapSSR, hashId] = useStyle$9(prefixCls);
+          const [wrapSSR, hashId] = useStyle$a(prefixCls);
           const cls = vue.computed(() => classNames(prefixCls.value, `${prefixCls.value}-element`, {
             [`${prefixCls.value}-active`]: props2.active,
             [`${prefixCls.value}-block`]: props2.block
@@ -22769,7 +22786,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("skeleton", props2);
-          const [wrapSSR, hashId] = useStyle$9(prefixCls);
+          const [wrapSSR, hashId] = useStyle$a(prefixCls);
           const cls = vue.computed(() => classNames(prefixCls.value, `${prefixCls.value}-element`, hashId.value));
           return () => {
             return wrapSSR(vue.createVNode("div", {
@@ -22806,7 +22823,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("skeleton", props2);
-          const [wrapSSR, hashId] = useStyle$9(prefixCls);
+          const [wrapSSR, hashId] = useStyle$a(prefixCls);
           const cls = vue.computed(() => classNames(prefixCls.value, `${prefixCls.value}-element`, {
             [`${prefixCls.value}-active`]: props2.active
           }, hashId.value));
@@ -22897,7 +22914,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             direction,
             size
           } = useConfigInject("card", props2);
-          const [wrapSSR, hashId] = useStyle$a(prefixCls);
+          const [wrapSSR, hashId] = useStyle$b(prefixCls);
           const getAction = (actions) => {
             const actionList = actions.map((action, index2) => vue.isVNode(action) && !isEmptyElement(action) || !vue.isVNode(action) ? vue.createVNode("li", {
               "style": {
@@ -23347,7 +23364,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$8 = genComponentStyleHook("Collapse", (token2) => {
+      const useStyle$9 = genComponentStyleHook("Collapse", (token2) => {
         const collapseToken = merge(token2, {
           collapseContentBg: token2.colorBgContainer,
           collapseHeaderBg: token2.colorFillAlter,
@@ -23396,7 +23413,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             direction,
             rootPrefixCls
           } = useConfigInject("collapse", props2);
-          const [wrapSSR, hashId] = useStyle$8(prefixCls);
+          const [wrapSSR, hashId] = useStyle$9(prefixCls);
           const iconPosition = vue.computed(() => {
             const {
               expandIconPosition
@@ -23552,7 +23569,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      const __unplugin_components_5 = vue.defineComponent({
+      const __unplugin_components_7 = vue.defineComponent({
         compatConfig: {
           MODE: 3
         },
@@ -23653,10 +23670,10 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      Collapse.Panel = __unplugin_components_5;
+      Collapse.Panel = __unplugin_components_7;
       Collapse.install = function(app) {
         app.component(Collapse.name, Collapse);
-        app.component(__unplugin_components_5.name, __unplugin_components_5);
+        app.component(__unplugin_components_7.name, __unplugin_components_7);
         return app;
       };
       var LeftOutlined$2 = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z" } }] }, "name": "left", "theme": "outlined" };
@@ -24002,7 +24019,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      const Row = ARow;
+      const Row$2 = ARow;
       function _extends() {
         _extends = Object.assign ? Object.assign.bind() : function(target) {
           for (var i2 = 1; i2 < arguments.length; i2++) {
@@ -26109,7 +26126,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         };
       };
-      const useStyle$7 = genComponentStyleHook("Form", (token2, _ref) => {
+      const useStyle$8 = genComponentStyleHook("Form", (token2, _ref) => {
         let {
           rootPrefixCls
         } = _ref;
@@ -26137,7 +26154,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const baseClassName = vue.computed(() => `${prefixCls.value}-item-explain`);
           const visible = vue.computed(() => !!(props2.errors && props2.errors.length));
           const innerStatus = vue.ref(status.value);
-          const [, hashId] = useStyle$7(prefixCls);
+          const [, hashId] = useStyle$8(prefixCls);
           vue.watch([visible, status], () => {
             if (visible.value) {
               innerStatus.value = status.value;
@@ -26338,7 +26355,7 @@ summary tabindex target title type usemap value width wmode wrap`;
       });
       let indexGuid = 0;
       const defaultItemNamePrefixCls = "form_item";
-      const __unplugin_components_10 = vue.defineComponent({
+      const __unplugin_components_12 = vue.defineComponent({
         compatConfig: {
           MODE: 3
         },
@@ -26358,7 +26375,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const {
             prefixCls
           } = useConfigInject("form", props2);
-          const [wrapSSR, hashId] = useStyle$7(prefixCls);
+          const [wrapSSR, hashId] = useStyle$8(prefixCls);
           const itemRef = vue.shallowRef();
           const formContext = useInjectForm();
           const fieldName = vue.computed(() => props2.name || props2.prop);
@@ -26648,7 +26665,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             return wrapSSR(vue.createVNode("div", {
               "class": [itemClassName.value, withHelp ? `${prefixCls.value}-item-with-help` : "", attrs.class],
               "ref": itemRef
-            }, [vue.createVNode(Row, _objectSpread2$1(_objectSpread2$1({}, attrs), {}, {
+            }, [vue.createVNode(Row$2, _objectSpread2$1(_objectSpread2$1({}, attrs), {}, {
               "class": `${prefixCls.value}-row`,
               "key": "row"
             }), {
@@ -27028,7 +27045,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           hideRequiredMark: false,
           colon: true
         }),
-        Item: __unplugin_components_10,
+        Item: __unplugin_components_12,
         useForm,
         // emits: ['finishFailed', 'submit', 'finish', 'validate'],
         setup(props2, _ref) {
@@ -27071,7 +27088,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const validateMessages = vue.computed(() => {
             return _extends$1(_extends$1(_extends$1({}, defaultValidateMessages), globalValidateMessages.value), props2.validateMessages);
           });
-          const [wrapSSR, hashId] = useStyle$7(prefixCls);
+          const [wrapSSR, hashId] = useStyle$8(prefixCls);
           const formClassName = vue.computed(() => classNames(prefixCls.value, {
             [`${prefixCls.value}-${props2.layout}`]: true,
             [`${prefixCls.value}-hide-required-mark`]: mergedRequiredMark.value === false,
@@ -28132,7 +28149,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         ];
       };
-      const useStyle$6 = genComponentStyleHook("Message", (token2) => {
+      const useStyle$7 = genComponentStyleHook("Message", (token2) => {
         const combinedToken = merge(token2, {
           messageNoticeContentPadding: `${(token2.controlHeightLG - token2.fontSize * token2.lineHeight) / 2}px ${token2.paddingSM}px`
         });
@@ -28178,7 +28195,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             getPrefixCls
           } = useConfigContextInject();
           const prefixCls = vue.computed(() => props2.prefixCls || getPrefixCls("message"));
-          const [, hashId] = useStyle$6(prefixCls);
+          const [, hashId] = useStyle$7(prefixCls);
           return vue.createVNode(Notice, _objectSpread2$1(_objectSpread2$1({}, attrs), {}, {
             "prefixCls": prefixCls.value,
             "class": classNames(hashId.value, `${prefixCls.value}-notice-pure-panel`),
@@ -28223,7 +28240,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             getPopupContainer
           } = useConfigInject("message", props2);
           const prefixCls = vue.computed(() => getPrefixCls("message", props2.prefixCls));
-          const [, hashId] = useStyle$6(prefixCls);
+          const [, hashId] = useStyle$7(prefixCls);
           const getStyles = () => {
             var _a2;
             const top = (_a2 = props2.top) !== null && _a2 !== void 0 ? _a2 : DEFAULT_OFFSET$1;
@@ -28433,7 +28450,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           getContainer: getContainer || args.getPopupContainer,
           maxCount: maxCount$1,
           name: "message",
-          useStyle: useStyle$6
+          useStyle: useStyle$7
         }, (instance) => {
           if (messageInstance) {
             callback(messageInstance);
@@ -28808,7 +28825,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
         ];
       };
-      const useStyle$5 = genComponentStyleHook("Notification", (token2) => {
+      const useStyle$6 = genComponentStyleHook("Notification", (token2) => {
         const notificationPaddingVertical = token2.paddingMD;
         const notificationPaddingHorizontal = token2.paddingLG;
         const notificationToken = merge(token2, {
@@ -28892,7 +28909,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           } = useConfigInject("notification", props2);
           const prefixCls = vue.computed(() => props2.prefixCls || getPrefixCls("notification"));
           const noticePrefixCls = vue.computed(() => `${prefixCls.value}-notice`);
-          const [, hashId] = useStyle$5(prefixCls);
+          const [, hashId] = useStyle$6(prefixCls);
           return () => {
             return vue.createVNode(Notice, _objectSpread2$1(_objectSpread2$1({}, props2), {}, {
               "prefixCls": prefixCls.value,
@@ -29004,7 +29021,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             var _a, _b;
             return getPlacementStyle(placement, (_a = props2.top) !== null && _a !== void 0 ? _a : DEFAULT_OFFSET, (_b = props2.bottom) !== null && _b !== void 0 ? _b : DEFAULT_OFFSET);
           };
-          const [, hashId] = useStyle$5(prefixCls);
+          const [, hashId] = useStyle$6(prefixCls);
           const getClassName = () => classNames(hashId.value, {
             [`${prefixCls.value}-rtl`]: props2.rtl
           });
@@ -29171,7 +29188,7 @@ summary tabindex target title type usemap value width wmode wrap`;
         Notification$2.newInstance({
           name: "notification",
           prefixCls: customizePrefixCls || defaultPrefixCls$1,
-          useStyle: useStyle$5,
+          useStyle: useStyle$6,
           class: notificationClass,
           style: getPlacementStyle(placement, top !== null && top !== void 0 ? top : defaultTop, bottom !== null && bottom !== void 0 ? bottom : defaultBottom),
           appContext,
@@ -29335,7 +29352,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           updateCSS$1(style2, `${dynamicStyleMark}-dynamic-theme`);
         }
       }
-      const useStyle$3 = (iconPrefixCls) => {
+      const useStyle$4 = (iconPrefixCls) => {
         const [theme, token2] = useToken();
         return useStyleRegister(vue.computed(() => ({
           theme: theme.value,
@@ -29350,7 +29367,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           })
         }]);
       };
-      const useStyle$4 = useStyle$3;
+      const useStyle$5 = useStyle$4;
       function useTheme(theme, parentTheme) {
         const themeConfig = vue.computed(() => (theme === null || theme === void 0 ? void 0 : theme.value) || {});
         const parentThemeConfig = vue.computed(() => themeConfig.value.inherit === false || !(parentTheme === null || parentTheme === void 0 ? void 0 : parentTheme.value) ? defaultConfig : parentTheme.value);
@@ -29460,7 +29477,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             var _a;
             return props2.csp || ((_a = parentContext.csp) === null || _a === void 0 ? void 0 : _a.value);
           });
-          const wrapSSR = useStyle$4(iconPrefixCls);
+          const wrapSSR = useStyle$5(iconPrefixCls);
           const mergedTheme = useTheme(vue.computed(() => props2.theme), vue.computed(() => {
             var _a;
             return (_a = parentContext.theme) === null || _a === void 0 ? void 0 : _a.value;
@@ -29627,6 +29644,562 @@ summary tabindex target title type usemap value width wmode wrap`;
         app.component(ConfigProvider.name, ConfigProvider);
       };
       const ConfigProvider$1 = ConfigProvider;
+      function notEmpty(val) {
+        return val !== void 0 && val !== null;
+      }
+      const Cell = (props2) => {
+        const {
+          itemPrefixCls,
+          component,
+          span,
+          labelStyle,
+          contentStyle,
+          bordered,
+          label,
+          content,
+          colon
+        } = props2;
+        const Component = component;
+        if (bordered) {
+          return vue.createVNode(Component, {
+            "class": [{
+              [`${itemPrefixCls}-item-label`]: notEmpty(label),
+              [`${itemPrefixCls}-item-content`]: notEmpty(content)
+            }],
+            "colSpan": span
+          }, {
+            default: () => [notEmpty(label) && vue.createVNode("span", {
+              "style": labelStyle
+            }, [label]), notEmpty(content) && vue.createVNode("span", {
+              "style": contentStyle
+            }, [content])]
+          });
+        }
+        return vue.createVNode(Component, {
+          "class": [`${itemPrefixCls}-item`],
+          "colSpan": span
+        }, {
+          default: () => [vue.createVNode("div", {
+            "class": `${itemPrefixCls}-item-container`
+          }, [(label || label === 0) && vue.createVNode("span", {
+            "class": [`${itemPrefixCls}-item-label`, {
+              [`${itemPrefixCls}-item-no-colon`]: !colon
+            }],
+            "style": labelStyle
+          }, [label]), (content || content === 0) && vue.createVNode("span", {
+            "class": `${itemPrefixCls}-item-content`,
+            "style": contentStyle
+          }, [content])])]
+        });
+      };
+      const Cell$1 = Cell;
+      const Row = (props2) => {
+        const renderCells = (items, _ref, _ref2) => {
+          let {
+            colon,
+            prefixCls: prefixCls2,
+            bordered: bordered2
+          } = _ref;
+          let {
+            component,
+            type: type2,
+            showLabel,
+            showContent,
+            labelStyle: rootLabelStyle,
+            contentStyle: rootContentStyle
+          } = _ref2;
+          return items.map((item, index3) => {
+            var _a, _b;
+            const itemProps = item.props || {};
+            const {
+              prefixCls: itemPrefixCls = prefixCls2,
+              span = 1,
+              labelStyle: labelStyle2 = itemProps["label-style"],
+              contentStyle: contentStyle2 = itemProps["content-style"],
+              label = (_b = (_a = item.children) === null || _a === void 0 ? void 0 : _a.label) === null || _b === void 0 ? void 0 : _b.call(_a)
+            } = itemProps;
+            const children = getSlot(item);
+            const className = getClass(item);
+            const style2 = getStyle$1(item);
+            const {
+              key: key2
+            } = item;
+            if (typeof component === "string") {
+              return vue.createVNode(Cell$1, {
+                "key": `${type2}-${String(key2) || index3}`,
+                "class": className,
+                "style": style2,
+                "labelStyle": _extends$1(_extends$1({}, rootLabelStyle), labelStyle2),
+                "contentStyle": _extends$1(_extends$1({}, rootContentStyle), contentStyle2),
+                "span": span,
+                "colon": colon,
+                "component": component,
+                "itemPrefixCls": itemPrefixCls,
+                "bordered": bordered2,
+                "label": showLabel ? label : null,
+                "content": showContent ? children : null
+              }, null);
+            }
+            return [vue.createVNode(Cell$1, {
+              "key": `label-${String(key2) || index3}`,
+              "class": className,
+              "style": _extends$1(_extends$1(_extends$1({}, rootLabelStyle), style2), labelStyle2),
+              "span": 1,
+              "colon": colon,
+              "component": component[0],
+              "itemPrefixCls": itemPrefixCls,
+              "bordered": bordered2,
+              "label": label
+            }, null), vue.createVNode(Cell$1, {
+              "key": `content-${String(key2) || index3}`,
+              "class": className,
+              "style": _extends$1(_extends$1(_extends$1({}, rootContentStyle), style2), contentStyle2),
+              "span": span * 2 - 1,
+              "component": component[1],
+              "itemPrefixCls": itemPrefixCls,
+              "bordered": bordered2,
+              "content": children
+            }, null)];
+          });
+        };
+        const {
+          prefixCls,
+          vertical,
+          row,
+          index: index2,
+          bordered
+        } = props2;
+        const {
+          labelStyle,
+          contentStyle
+        } = vue.inject(descriptionsContext, {
+          labelStyle: vue.ref({}),
+          contentStyle: vue.ref({})
+        });
+        if (vertical) {
+          return vue.createVNode(vue.Fragment, null, [vue.createVNode("tr", {
+            "key": `label-${index2}`,
+            "class": `${prefixCls}-row`
+          }, [renderCells(row, props2, {
+            component: "th",
+            type: "label",
+            showLabel: true,
+            labelStyle: labelStyle.value,
+            contentStyle: contentStyle.value
+          })]), vue.createVNode("tr", {
+            "key": `content-${index2}`,
+            "class": `${prefixCls}-row`
+          }, [renderCells(row, props2, {
+            component: "td",
+            type: "content",
+            showContent: true,
+            labelStyle: labelStyle.value,
+            contentStyle: contentStyle.value
+          })])]);
+        }
+        return vue.createVNode("tr", {
+          "key": index2,
+          "class": `${prefixCls}-row`
+        }, [renderCells(row, props2, {
+          component: bordered ? ["th", "td"] : "td",
+          type: "item",
+          showLabel: true,
+          showContent: true,
+          labelStyle: labelStyle.value,
+          contentStyle: contentStyle.value
+        })]);
+      };
+      const Row$1 = Row;
+      const genBorderedStyle = (token2) => {
+        const {
+          componentCls,
+          descriptionsSmallPadding,
+          descriptionsDefaultPadding,
+          descriptionsMiddlePadding,
+          descriptionsBg
+        } = token2;
+        return {
+          [`&${componentCls}-bordered`]: {
+            [`${componentCls}-view`]: {
+              border: `${token2.lineWidth}px ${token2.lineType} ${token2.colorSplit}`,
+              "> table": {
+                tableLayout: "auto",
+                borderCollapse: "collapse"
+              }
+            },
+            [`${componentCls}-item-label, ${componentCls}-item-content`]: {
+              padding: descriptionsDefaultPadding,
+              borderInlineEnd: `${token2.lineWidth}px ${token2.lineType} ${token2.colorSplit}`,
+              "&:last-child": {
+                borderInlineEnd: "none"
+              }
+            },
+            [`${componentCls}-item-label`]: {
+              backgroundColor: descriptionsBg,
+              "&::after": {
+                display: "none"
+              }
+            },
+            [`${componentCls}-row`]: {
+              borderBottom: `${token2.lineWidth}px ${token2.lineType} ${token2.colorSplit}`,
+              "&:last-child": {
+                borderBottom: "none"
+              }
+            },
+            [`&${componentCls}-middle`]: {
+              [`${componentCls}-item-label, ${componentCls}-item-content`]: {
+                padding: descriptionsMiddlePadding
+              }
+            },
+            [`&${componentCls}-small`]: {
+              [`${componentCls}-item-label, ${componentCls}-item-content`]: {
+                padding: descriptionsSmallPadding
+              }
+            }
+          }
+        };
+      };
+      const genDescriptionStyles = (token2) => {
+        const {
+          componentCls,
+          descriptionsExtraColor,
+          descriptionItemPaddingBottom,
+          descriptionsItemLabelColonMarginRight,
+          descriptionsItemLabelColonMarginLeft,
+          descriptionsTitleMarginBottom
+        } = token2;
+        return {
+          [componentCls]: _extends$1(_extends$1(_extends$1({}, resetComponent(token2)), genBorderedStyle(token2)), {
+            [`&-rtl`]: {
+              direction: "rtl"
+            },
+            [`${componentCls}-header`]: {
+              display: "flex",
+              alignItems: "center",
+              marginBottom: descriptionsTitleMarginBottom
+            },
+            [`${componentCls}-title`]: _extends$1(_extends$1({}, textEllipsis), {
+              flex: "auto",
+              color: token2.colorText,
+              fontWeight: token2.fontWeightStrong,
+              fontSize: token2.fontSizeLG,
+              lineHeight: token2.lineHeightLG
+            }),
+            [`${componentCls}-extra`]: {
+              marginInlineStart: "auto",
+              color: descriptionsExtraColor,
+              fontSize: token2.fontSize
+            },
+            [`${componentCls}-view`]: {
+              width: "100%",
+              borderRadius: token2.borderRadiusLG,
+              table: {
+                width: "100%",
+                tableLayout: "fixed"
+              }
+            },
+            [`${componentCls}-row`]: {
+              "> th, > td": {
+                paddingBottom: descriptionItemPaddingBottom
+              },
+              "&:last-child": {
+                borderBottom: "none"
+              }
+            },
+            [`${componentCls}-item-label`]: {
+              color: token2.colorText,
+              fontWeight: "normal",
+              fontSize: token2.fontSize,
+              lineHeight: token2.lineHeight,
+              textAlign: `start`,
+              "&::after": {
+                content: '":"',
+                position: "relative",
+                top: -0.5,
+                marginInline: `${descriptionsItemLabelColonMarginLeft}px ${descriptionsItemLabelColonMarginRight}px`
+              },
+              [`&${componentCls}-item-no-colon::after`]: {
+                content: '""'
+              }
+            },
+            [`${componentCls}-item-no-label`]: {
+              "&::after": {
+                margin: 0,
+                content: '""'
+              }
+            },
+            [`${componentCls}-item-content`]: {
+              display: "table-cell",
+              flex: 1,
+              color: token2.colorText,
+              fontSize: token2.fontSize,
+              lineHeight: token2.lineHeight,
+              wordBreak: "break-word",
+              overflowWrap: "break-word"
+            },
+            [`${componentCls}-item`]: {
+              paddingBottom: 0,
+              verticalAlign: "top",
+              "&-container": {
+                display: "flex",
+                [`${componentCls}-item-label`]: {
+                  display: "inline-flex",
+                  alignItems: "baseline"
+                },
+                [`${componentCls}-item-content`]: {
+                  display: "inline-flex",
+                  alignItems: "baseline"
+                }
+              }
+            },
+            "&-middle": {
+              [`${componentCls}-row`]: {
+                "> th, > td": {
+                  paddingBottom: token2.paddingSM
+                }
+              }
+            },
+            "&-small": {
+              [`${componentCls}-row`]: {
+                "> th, > td": {
+                  paddingBottom: token2.paddingXS
+                }
+              }
+            }
+          })
+        };
+      };
+      const useStyle$3 = genComponentStyleHook("Descriptions", (token2) => {
+        const descriptionsBg = token2.colorFillAlter;
+        const descriptionsTitleMarginBottom = token2.fontSizeSM * token2.lineHeightSM;
+        const descriptionsExtraColor = token2.colorText;
+        const descriptionsSmallPadding = `${token2.paddingXS}px ${token2.padding}px`;
+        const descriptionsDefaultPadding = `${token2.padding}px ${token2.paddingLG}px`;
+        const descriptionsMiddlePadding = `${token2.paddingSM}px ${token2.paddingLG}px`;
+        const descriptionItemPaddingBottom = token2.padding;
+        const descriptionsItemLabelColonMarginRight = token2.marginXS;
+        const descriptionsItemLabelColonMarginLeft = token2.marginXXS / 2;
+        const descriptionToken = merge(token2, {
+          descriptionsBg,
+          descriptionsTitleMarginBottom,
+          descriptionsExtraColor,
+          descriptionItemPaddingBottom,
+          descriptionsSmallPadding,
+          descriptionsDefaultPadding,
+          descriptionsMiddlePadding,
+          descriptionsItemLabelColonMarginRight,
+          descriptionsItemLabelColonMarginLeft
+        });
+        return [genDescriptionStyles(descriptionToken)];
+      });
+      ({
+        prefixCls: String,
+        label: PropTypes$1.any,
+        span: Number
+      });
+      const descriptionsItemProp = () => ({
+        prefixCls: String,
+        label: PropTypes$1.any,
+        labelStyle: {
+          type: Object,
+          default: void 0
+        },
+        contentStyle: {
+          type: Object,
+          default: void 0
+        },
+        span: {
+          type: Number,
+          default: 1
+        }
+      });
+      const DescriptionsItem = vue.defineComponent({
+        compatConfig: {
+          MODE: 3
+        },
+        name: "ADescriptionsItem",
+        props: descriptionsItemProp(),
+        setup(_2, _ref) {
+          let {
+            slots
+          } = _ref;
+          return () => {
+            var _a;
+            return (_a = slots.default) === null || _a === void 0 ? void 0 : _a.call(slots);
+          };
+        }
+      });
+      const DEFAULT_COLUMN_MAP = {
+        xxxl: 3,
+        xxl: 3,
+        xl: 3,
+        lg: 3,
+        md: 3,
+        sm: 2,
+        xs: 1
+      };
+      function getColumn(column2, screens) {
+        if (typeof column2 === "number") {
+          return column2;
+        }
+        if (typeof column2 === "object") {
+          for (let i2 = 0; i2 < responsiveArray.length; i2++) {
+            const breakpoint = responsiveArray[i2];
+            if (screens[breakpoint] && column2[breakpoint] !== void 0) {
+              return column2[breakpoint] || DEFAULT_COLUMN_MAP[breakpoint];
+            }
+          }
+        }
+        return 3;
+      }
+      function getFilledItem(node2, rowRestCol, span) {
+        let clone = node2;
+        if (span === void 0 || span > rowRestCol) {
+          clone = cloneElement(node2, {
+            span: rowRestCol
+          });
+        }
+        return clone;
+      }
+      function getRows(children, column2) {
+        const childNodes = flattenChildren(children);
+        const rows = [];
+        let tmpRow = [];
+        let rowRestCol = column2;
+        childNodes.forEach((node2, index2) => {
+          var _a;
+          const span = (_a = node2.props) === null || _a === void 0 ? void 0 : _a.span;
+          const mergedSpan = span || 1;
+          if (index2 === childNodes.length - 1) {
+            tmpRow.push(getFilledItem(node2, rowRestCol, span));
+            rows.push(tmpRow);
+            return;
+          }
+          if (mergedSpan < rowRestCol) {
+            rowRestCol -= mergedSpan;
+            tmpRow.push(node2);
+          } else {
+            tmpRow.push(getFilledItem(node2, rowRestCol, mergedSpan));
+            rows.push(tmpRow);
+            rowRestCol = column2;
+            tmpRow = [];
+          }
+        });
+        return rows;
+      }
+      const descriptionsProps = () => ({
+        prefixCls: String,
+        bordered: {
+          type: Boolean,
+          default: void 0
+        },
+        size: {
+          type: String,
+          default: "default"
+        },
+        title: PropTypes$1.any,
+        extra: PropTypes$1.any,
+        column: {
+          type: [Number, Object],
+          default: () => DEFAULT_COLUMN_MAP
+        },
+        layout: String,
+        colon: {
+          type: Boolean,
+          default: void 0
+        },
+        labelStyle: {
+          type: Object,
+          default: void 0
+        },
+        contentStyle: {
+          type: Object,
+          default: void 0
+        }
+      });
+      const descriptionsContext = Symbol("descriptionsContext");
+      const Descriptions = vue.defineComponent({
+        compatConfig: {
+          MODE: 3
+        },
+        name: "ADescriptions",
+        inheritAttrs: false,
+        props: descriptionsProps(),
+        slots: Object,
+        Item: DescriptionsItem,
+        setup(props2, _ref2) {
+          let {
+            slots,
+            attrs
+          } = _ref2;
+          const {
+            prefixCls,
+            direction
+          } = useConfigInject("descriptions", props2);
+          let token2;
+          const screens = vue.ref({});
+          const [wrapSSR, hashId] = useStyle$3(prefixCls);
+          const responsiveObserve = useResponsiveObserver();
+          vue.onBeforeMount(() => {
+            token2 = responsiveObserve.value.subscribe((screen) => {
+              if (typeof props2.column !== "object") {
+                return;
+              }
+              screens.value = screen;
+            });
+          });
+          vue.onBeforeUnmount(() => {
+            responsiveObserve.value.unsubscribe(token2);
+          });
+          vue.provide(descriptionsContext, {
+            labelStyle: vue.toRef(props2, "labelStyle"),
+            contentStyle: vue.toRef(props2, "contentStyle")
+          });
+          const mergeColumn = vue.computed(() => getColumn(props2.column, screens.value));
+          return () => {
+            var _a, _b, _c;
+            const {
+              size,
+              bordered = false,
+              layout = "horizontal",
+              colon = true,
+              title = (_a = slots.title) === null || _a === void 0 ? void 0 : _a.call(slots),
+              extra = (_b = slots.extra) === null || _b === void 0 ? void 0 : _b.call(slots)
+            } = props2;
+            const children = (_c = slots.default) === null || _c === void 0 ? void 0 : _c.call(slots);
+            const rows = getRows(children, mergeColumn.value);
+            return wrapSSR(vue.createVNode("div", _objectSpread2$1(_objectSpread2$1({}, attrs), {}, {
+              "class": [prefixCls.value, {
+                [`${prefixCls.value}-${size}`]: size !== "default",
+                [`${prefixCls.value}-bordered`]: !!bordered,
+                [`${prefixCls.value}-rtl`]: direction.value === "rtl"
+              }, attrs.class, hashId.value]
+            }), [(title || extra) && vue.createVNode("div", {
+              "class": `${prefixCls.value}-header`
+            }, [title && vue.createVNode("div", {
+              "class": `${prefixCls.value}-title`
+            }, [title]), extra && vue.createVNode("div", {
+              "class": `${prefixCls.value}-extra`
+            }, [extra])]), vue.createVNode("div", {
+              "class": `${prefixCls.value}-view`
+            }, [vue.createVNode("table", null, [vue.createVNode("tbody", null, [rows.map((row, index2) => vue.createVNode(Row$1, {
+              "key": index2,
+              "index": index2,
+              "colon": colon,
+              "prefixCls": prefixCls.value,
+              "vertical": layout === "vertical",
+              "bordered": bordered,
+              "row": row
+            }, null))])])])]));
+          };
+        }
+      });
+      Descriptions.install = function(app) {
+        app.component(Descriptions.name, Descriptions);
+        app.component(Descriptions.Item.name, Descriptions.Item);
+        return app;
+      };
+      const __unplugin_components_5 = Descriptions;
       const props = () => ({
         prefixCls: String,
         width: PropTypes$1.oneOfType([PropTypes$1.string, PropTypes$1.number]),
@@ -30725,7 +31298,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      const __unplugin_components_13 = withInstall(Drawer);
+      const __unplugin_components_15 = withInstall(Drawer);
       const isValid$1 = (value) => {
         return value !== void 0 && value !== null && (Array.isArray(value) ? filterEmpty(value).length : true);
       };
@@ -31314,7 +31887,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const mergedSize = vue.computed(() => {
             return compactSize.value || size.value;
           });
-          const [wrapSSR, hashId] = useStyle$c(prefixCls);
+          const [wrapSSR, hashId] = useStyle$d(prefixCls);
           const disabled = useInjectDisabled();
           const focus = (option) => {
             var _a;
@@ -31443,7 +32016,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      const __unplugin_components_9 = vue.defineComponent({
+      const __unplugin_components_11 = vue.defineComponent({
         compatConfig: {
           MODE: 3
         },
@@ -31474,7 +32047,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             isFormItemInput: false
           });
           const inputPrefixCls = vue.computed(() => getPrefixCls("input"));
-          const [wrapSSR, hashId] = useStyle$c(inputPrefixCls);
+          const [wrapSSR, hashId] = useStyle$d(inputPrefixCls);
           const cls = vue.computed(() => {
             const pre = prefixCls.value;
             return {
@@ -32069,7 +32642,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             size,
             direction
           } = useConfigInject("input", props2);
-          const [wrapSSR, hashId] = useStyle$c(prefixCls);
+          const [wrapSSR, hashId] = useStyle$d(prefixCls);
           const disabled = useInjectDisabled();
           const showCount = vue.computed(() => {
             return props2.showCount === "" || props2.showCount || false;
@@ -32471,7 +33044,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
         }
       });
-      Input.Group = __unplugin_components_9;
+      Input.Group = __unplugin_components_11;
       Input.Search = Search;
       Input.TextArea = TextArea;
       Input.Password = Password;
@@ -35596,7 +36169,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             space,
             direction: directionConfig
           } = useConfigInject("space", props2);
-          const [wrapSSR, hashId] = useStyle$j(prefixCls);
+          const [wrapSSR, hashId] = useStyle$k(prefixCls);
           const supportFlexGap = useFlexGapSupport();
           const size = vue.computed(() => {
             var _a, _b, _c;
@@ -36310,7 +36883,9 @@ summary tabindex target title type usemap value width wmode wrap`;
       ThunderboltOutlined.inheritAttrs = false;
       const ThunderboltOutlined$1 = ThunderboltOutlined;
       const _hoisted_1 = { class: "harvest-wrap" };
-      const _hoisted_2 = { style: { "margin-left": "3px" } };
+      const _hoisted_2 = ["textContent"];
+      const _hoisted_3 = ["textContent"];
+      const _hoisted_4 = { style: { "margin-left": "3px" } };
       const _sfc_main = /* @__PURE__ */ vue.defineComponent({
         __name: "App",
         setup(__props) {
@@ -36336,6 +36911,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           const cookie = vue.ref("");
           const url_list = vue.ref([]);
           const modal_title = vue.ref("下载到");
+          const singleTorrent = vue.ref(null);
           const showModal = () => {
             if (downloaders.value.length <= 0) {
               message.warning("没有可用的下载器！请先在收割机中添加！");
@@ -36806,6 +37382,8 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
           async function download_to() {
             await get_torrent_detail();
+            console.log(torrents.value);
+            singleTorrent.value = torrents.value[0];
             await generate_magnet_url(false);
             modal_title.value = "正在下载当前种子...";
             showModal();
@@ -36868,16 +37446,18 @@ summary tabindex target title type usemap value width wmode wrap`;
             const _component_a_button = Button;
             const _component_a_space_compact = __unplugin_components_2;
             const _component_a_space = __unplugin_components_3;
+            const _component_a_descriptions_item = DescriptionsItem;
+            const _component_a_descriptions = __unplugin_components_5;
             const _component_a_avatar = Avatar$1;
-            const _component_a_collapse_panel = __unplugin_components_5;
+            const _component_a_collapse_panel = __unplugin_components_7;
             const _component_a_collapse = Collapse;
             const _component_a_modal = Modal;
             const _component_a_input = Input;
-            const _component_a_input_group = __unplugin_components_9;
-            const _component_a_form_item = __unplugin_components_10;
+            const _component_a_input_group = __unplugin_components_11;
+            const _component_a_form_item = __unplugin_components_12;
             const _component_a_form = Form$1;
             const _component_a_card = Card$1;
-            const _component_a_drawer = __unplugin_components_13;
+            const _component_a_drawer = __unplugin_components_15;
             return vue.openBlock(), vue.createElementBlock("div", _hoisted_1, [
               vue.createVNode(_component_a_image, {
                 fallback: `${api2.value}favicon.png`,
@@ -36991,6 +37571,32 @@ summary tabindex target title type usemap value width wmode wrap`;
                 onOk: handleOk
               }, {
                 default: vue.withCtx(() => [
+                  vue.createVNode(_component_a_descriptions, {
+                    column: 1,
+                    title: singleTorrent.value.subtitle,
+                    bordered: "",
+                    size: "small"
+                  }, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_a_descriptions_item, null, {
+                        default: vue.withCtx(() => [
+                          vue.createElementVNode("span", {
+                            textContent: vue.toDisplayString(singleTorrent.value.title)
+                          }, null, 8, _hoisted_2)
+                        ]),
+                        _: 1
+                      }),
+                      vue.createVNode(_component_a_descriptions_item, null, {
+                        default: vue.withCtx(() => [
+                          vue.createElementVNode("span", {
+                            textContent: vue.toDisplayString(singleTorrent.value.magnet_url)
+                          }, null, 8, _hoisted_3)
+                        ]),
+                        _: 1
+                      })
+                    ]),
+                    _: 1
+                  }, 8, ["title"]),
                   vue.createVNode(_component_a_collapse, {
                     activeKey: activeKey.value,
                     "onUpdate:activeKey": _cache[1] || (_cache[1] = ($event) => activeKey.value = $event),
@@ -37013,7 +37619,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                               ]),
                               _: 2
                             }, 1024),
-                            vue.createElementVNode("span", _hoisted_2, vue.toDisplayString(d2.name), 1)
+                            vue.createElementVNode("span", _hoisted_4, vue.toDisplayString(d2.name), 1)
                           ]),
                           default: vue.withCtx(() => [
                             vue.createVNode(_component_a_space, {
