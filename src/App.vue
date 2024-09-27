@@ -92,7 +92,7 @@ const modal_title = ref<string>('下载到')
 
 const showModal = () => {
   if (downloaders.value.length <= 0) {
-    message.warning('没有可用的下载器！请先在ptools中添加！')
+    message.warning('没有可用的下载器！请先在收割机中添加！')
     return
   }
   if (torrents.value.length <= 0) {
@@ -248,7 +248,7 @@ async function getSiteData() {
   let mySiteId = sessionStorage.getItem('mySite')
   console.log(site_info)
   if (site_info === false) {
-    message.error('ptools服务器连接失败！')
+    message.error('收割机服务器连接失败！')
     return false;
   }
   console.log(site_info.my_uid_rule)
@@ -329,7 +329,7 @@ const getTimeJoin = () => {
 }
 
 /**
- * 保存站点信息到PTools
+ * 保存站点信息到收割机
  */
 async function sync_cookie() {
   await getSite()
@@ -343,7 +343,7 @@ async function sync_cookie() {
 }
 
 /**
- * 发送站点信息到PTools
+ * 发送站点信息到收割机
  * @param data
  */
 async function send_site_info(data: string) {
@@ -367,7 +367,7 @@ async function send_site_info(data: string) {
         }
         console.log('站点信息获取成功！', res.msg)
         console.log(res)
-        message.success('PTools提醒您：' + res.msg)
+        message.success('收割机提醒您：' + res.msg)
         resolve(res)
       }, onerror: function () {
         reject("站点信息获取失败")
@@ -635,7 +635,7 @@ const push_torrent = async (downloader_id: number, category: string) => {
 
 
 /**
- * 同步种子信息到 ptools
+ * 同步种子信息到 收割机
  */
 const sync_torrents = async () => {
   GM_xmlhttpRequest({
@@ -652,7 +652,7 @@ const sync_torrents = async () => {
       console.log(res)
       if (res.code == 0) {
         console.log('种子信息同步成功！', res.msg)
-        // message.success('PTools提醒您：' + res.msg)
+        // message.success('收割机 提醒您：' + res.msg)
       } else {
         console.log(res)
       }
@@ -728,7 +728,7 @@ async function download_free() {
 
 function checkServer() {
   api.value = GM_getValue("harvest_api", "")
-  token.value = GM_getValue("harvest_token", "ptools")
+  token.value = GM_getValue("harvest_token", "harvest")
   console.log(api.value)
   if (!api.value) {
     showInitModal()
@@ -752,24 +752,28 @@ const handleSaveServer = () => {
 }
 const init = ref(0)
 onBeforeMount(async () => {
-  // 最顶层才加载
-  if (window.top != window.self) return;
-  if (!checkServer()) return;
-  // 只加载一次
-  while (init.value < 1) {
-    if (!sessionStorage.getItem('website')) {
-      await getSite()
+  try {
+    // 最顶层才加载
+    if (window.top != window.self) return;
+    if (!checkServer()) return;
+    // 只加载一次
+    while (init.value < 1) {
+      if (!sessionStorage.getItem('website')) {
+        await getSite()
+      }
+      await getDownloaders()
+      await init_button()
+      init.value++
     }
-    await getDownloaders()
-    await init_button()
-    init.value++
+  } catch (error) {
+    console.error('Error in beforeMount:', error);
   }
 })
 
 </script>
 
 <template>
-  <div class="ptools-wrap">
+  <div class="harvest-wrap">
     <a-image
         :fallback="`${api}favicon.png`"
         :preview="false"
@@ -927,23 +931,22 @@ onBeforeMount(async () => {
         </a-collapse-panel>
       </a-collapse>
     </a-modal>
-    <a-modal v-model:open="init_modal" :footer="null" cancel-text="取消"
-             ok-text="保存" style="width: 350px;margin: auto" title="请填写Harvest服务器地址" @ok="handleSaveServer">
+    <a-modal v-model:open="init_modal" :footer="null" cancel-text="取消" ok-text="保存"
+             title="请填写收割机服务器地址" width="400px"
+             @ok="handleSaveServer">
       <a-form layout="vertical" style="margin: auto;">
-        <a-form-item
-            label="Harvest">
+        <a-form-item>
           <a-input-group compact>
             <a-input v-model:value="api" placeholder="Harvest服务器地址" style="width: 220px;"/>
             <a-button :href="api" danger style="width: 80px;" target="_blank" type="dashed">打开
             </a-button>
           </a-input-group>
         </a-form-item>
-        <a-form-item
-            label="Token">
+        <a-form-item>
           <a-input v-model:value.lazy="token" autofocus label="Token" placeholder="安全Token" style="width: 300px;"/>
         </a-form-item>
         <a-form-item>
-          <a-button style="width: 100%;" type="primary" @click="handleSaveServer">保存</a-button>
+          <a-button style="width: 300px;" type="primary" @click="handleSaveServer">保存</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -1003,27 +1006,4 @@ onBeforeMount(async () => {
   </div>
 </template>
 
-<style scoped>
-.ptools-wrap {
-  position: fixed;
-  top: 0;
-  z-index: 99999;
-  width: 110px;
-  margin-right: 0;
-  margin-left: 0;
-  margin-top: 240px;
-  float: left;
-  opacity: 0.8;
-  font-size: 12px;
-  background-color: #fff;
-}
 
-.ptools-wrap:hover {
-  opacity: 1.0;
-}
-
-.ptools-wrap > img, .image {
-  border-radius: 2px;
-  width: 100%;
-}
-</style>

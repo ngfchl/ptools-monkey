@@ -24,3 +24,11 @@ body {
     width: 110px;
 }
 
+.ant-form {
+    text-align: center;
+}
+
+.ant-form-item-label {
+    text-align: center !important;
+    margin: auto !important;
+}
