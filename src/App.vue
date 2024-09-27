@@ -604,10 +604,10 @@ const generate_magnet_url = async (flag: boolean) => {
  */
 const push_torrent = async (downloader_id: number, category: string) => {
   let mySiteId = sessionStorage.getItem('mySite');
-  await generate_magnet_url(true)
+  await generate_magnet_url(false)
   console.log(url_list.value)
   if (url_list.value.length <= 0) {
-    message.error('没有抓去到种子链接！')
+    message.error('没有抓到种子链接！')
     return
   }
   let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(',')}`
