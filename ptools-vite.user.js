@@ -162,7 +162,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-eb82a288.js"(exports, module) {
+    "main-a50253e9.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -37105,10 +37105,10 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
           const push_torrent = async (downloader_id, category) => {
             let mySiteId = sessionStorage.getItem("mySite");
-            await generate_magnet_url(true);
+            await generate_magnet_url(false);
             console.log(url_list.value);
             if (url_list.value.length <= 0) {
-              message.error("没有抓去到种子链接！");
+              message.error("没有抓到种子链接！");
               return;
             }
             let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(",")}`;
