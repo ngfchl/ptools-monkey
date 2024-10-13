@@ -166,6 +166,8 @@ export default defineConfig({
                     'https://ptzone.xyz/*',
                     'https://ptlgs.org/*',
                     'https://pt.ghacg.com/*',
+                    'https://hdbao.cc/*',
+                    'https://invites.fun/*',
                 ],
             },
             build: {

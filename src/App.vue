@@ -122,6 +122,7 @@ async function init_button() {
 
   if (location.pathname.startsWith('/details.php')
       || location.pathname.includes('/torrent.php')
+      || location.pathname.includes('/views.php')
       || location.pathname.includes('/Torrents/details')
       || location.pathname.search(/torrents\D*\d+/) > 0
   ) {
@@ -155,6 +156,7 @@ async function init_button() {
       location.href.includes('/user.php?id=') ||
       location.href.includes('/p_user/user_detail.php') ||
       location.href.includes('/user.php?u=') ||
+      location.href.includes('/u/') ||
       location.href.includes('/index.php?page=usercp&uid=') ||
       location.href.includes('/Users/profile?uid=') ||
       location.href.includes('/profile/') ||
@@ -393,6 +395,7 @@ async function get_torrent_list() {
   torrents.value.length = 0
   let site_info = JSON.parse(o!)
   let torrent_list = xpath(site_info.torrents_rule.replace("]/tr", "]/tbody/tr"), document)
+  console.log('获取到种子数量：', torrent_list.snapshotLength)
   for (let i = 0; i <= torrent_list.snapshotLength; i++) {
     try {
       let torrent_info = torrent_list.snapshotItem(i)
@@ -705,14 +708,14 @@ async function download_to() {
 async function download_all() {
   await get_torrent_list()
   await generate_magnet_url(false)
-  modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`
+  // modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`
   showModal()
 }
 
 async function download_free() {
   await get_torrent_list()
   await generate_magnet_url(true)
-  modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`
+  // modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`
   showModal()
 }
 
@@ -763,8 +766,10 @@ onBeforeMount(async () => {
       if (!sessionStorage.getItem('website')) {
         await getSite()
       }
-      await getDownloaders()
-      await init_button()
+      window.addEventListener('load', async () => {
+        await getDownloaders()
+        await init_button()
+      })
       init.value++
     }
   } catch (error) {
