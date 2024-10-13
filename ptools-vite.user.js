@@ -144,7 +144,9 @@
 // @match        https://ptzone.xyz/*
 // @match        https://ptlgs.org/*
 // @match        https://pt.ghacg.com/*
-// @require      https://cdn.jsdelivr.net/npm/vue@3.5.11/dist/vue.global.prod.js
+// @match        https://hdbao.cc/*
+// @match        https://invites.fun/*
+// @require      https://cdn.jsdelivr.net/npm/vue@3.5.12/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
 // @grant        GM_getValue
@@ -163,7 +165,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-a50253e9.js"(exports, module) {
+    "main-babb6831.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -36714,7 +36716,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             } else {
               user_detail_page.value = true;
             }
-            if (location.pathname.startsWith("/details.php") || location.pathname.includes("/torrent.php") || location.pathname.includes("/Torrents/details") || location.pathname.search(/torrents\D*\d+/) > 0) {
+            if (location.pathname.startsWith("/details.php") || location.pathname.includes("/torrent.php") || location.pathname.includes("/views.php") || location.pathname.includes("/Torrents/details") || location.pathname.search(/torrents\D*\d+/) > 0) {
               console.log("当前为种子详情页");
               torrent_detail_page.value = true;
               await get_torrent_detail();
@@ -36732,7 +36734,7 @@ summary tabindex target title type usemap value width wmode wrap`;
               torrent_list_page.value = true;
               await get_torrent_list();
             }
-            if (location.pathname.startsWith("/userdetails") || location.href.includes("/user.php?id=") || location.href.includes("/p_user/user_detail.php") || location.href.includes("/user.php?u=") || location.href.includes("/index.php?page=usercp&uid=") || location.href.includes("/Users/profile?uid=") || location.href.includes("/profile/") || location.href.includes("/users/")) {
+            if (location.pathname.startsWith("/userdetails") || location.href.includes("/user.php?id=") || location.href.includes("/p_user/user_detail.php") || location.href.includes("/user.php?u=") || location.href.includes("/u/") || location.href.includes("/index.php?page=usercp&uid=") || location.href.includes("/Users/profile?uid=") || location.href.includes("/profile/") || location.href.includes("/users/")) {
               console.log("当前为个人信息页");
               await sync_cookie();
             }
@@ -36917,6 +36919,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             torrents.value.length = 0;
             let site_info = JSON.parse(o2);
             let torrent_list = xpath(site_info.torrents_rule.replace("]/tr", "]/tbody/tr"), document);
+            console.log("获取到种子数量：", torrent_list.snapshotLength);
             for (let i2 = 0; i2 <= torrent_list.snapshotLength; i2++) {
               try {
                 let torrent_info = torrent_list.snapshotItem(i2);
@@ -37168,13 +37171,11 @@ summary tabindex target title type usemap value width wmode wrap`;
           async function download_all() {
             await get_torrent_list();
             await generate_magnet_url(false);
-            modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`;
             showModal();
           }
           async function download_free() {
             await get_torrent_list();
             await generate_magnet_url(true);
-            modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`;
             showModal();
           }
           function checkServer() {
@@ -37210,8 +37211,10 @@ summary tabindex target title type usemap value width wmode wrap`;
                 if (!sessionStorage.getItem("website")) {
                   await getSite();
                 }
-                await getDownloaders();
-                await init_button();
+                window.addEventListener("load", async () => {
+                  await getDownloaders();
+                  await init_button();
+                });
                 init.value++;
               }
             } catch (error) {
