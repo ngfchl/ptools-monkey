@@ -416,9 +416,28 @@ async function get_torrent_list() {
       let size_items = xpath(site_info.torrent_size_rule, torrent_info)
       let subtitle = xpath(site_info.torrent_subtitle_rule, torrent_info).snapshotItem(0)
       let tags = xpath(site_info.torrent_tags_rule, torrent_info)
+      console.log(detail_url)
+      if (!detail_url) continue
       let tid = detail_url!.textContent!.match(/id=(\d+)/)![1]
-
+      // 未获取到种子ID，pass
       console.log(tid)
+      console.log(magnet_url)
+      if (!tid) {
+        continue
+      }
+
+      if (!magnet_url) {
+        magnet_url = site_info.page_download.replace("{}", tid)
+        if (magnet_url.includes('{}')) {
+          magnet_url = magnet_url.replace("&passkey={}", "")
+        }
+        console.log(magnet_url)
+      } else {
+        magnet_url = magnet_url.textContent
+      }
+      if (!magnet_url.startsWith('http')) {
+        magnet_url = `${location.origin}${magnet_url.startsWith('/') ? magnet_url : `/${magnet_url}`}`
+      }
       let tag = []
       for (let i = 0; i < tags.snapshotLength; i++) {
         tag.push(tags.snapshotItem(i)!.textContent!.trim())
@@ -430,8 +449,7 @@ async function get_torrent_list() {
         size = size_items ? `${size_items.snapshotItem(0)!.textContent} ${size_items.snapshotItem(1)!.textContent}` : ''
       }
 
-      // 未获取到种子ID，pass
-      if (!tid) continue
+
       let torrent = {
         title: title ? title.textContent : '',
         subtitle: subtitle ? subtitle.textContent : '',
@@ -440,7 +458,7 @@ async function get_torrent_list() {
         completers: completers ? completers.textContent : 0, // detail_url: detail_url ? detail_url.textContent : '',
         hr: !hr,
         leechers: leechers ? leechers.textContent : 0,
-        magnet_url: magnet_url ? magnet_url.textContent : '', // poster: poster ? poster.textContent : '',
+        magnet_url: magnet_url, // poster: poster ? poster.textContent : '',
         published: published ? published.textContent : '',
         sale_expire: sale_expire ? sale_expire.textContent : '',
         sale_status: sale ? sale.textContent : '',
@@ -448,13 +466,14 @@ async function get_torrent_list() {
         poster: poster ? poster.textContent : '',
         tags: tags.snapshotLength > 0 ? tag.join() : '',
         tid: tid,
-        site_id: site_info.id,
+        site_id: site_info.name,
       }
       torrents.value.push(torrent)
     } catch (e) {
-      console.log(e)
+      console.trace(e)
     }
   }
+  console.log(torrents.value)
 }
 
 /**
@@ -898,8 +917,12 @@ onBeforeMount(async () => {
       <!--      </a-space-compact>-->
     </a-space>
     <a-modal v-model:open="open" :title="modal_title" @ok="handleOk">
-      <a-tooltip :title="singleTorrent.magnet_url">
-        <a-alert :message="singleTorrent.title"></a-alert>
+      <a-tooltip v-if="torrents.length <= 1" :title="url_list[0]">
+        <a-alert :message="singleTorrent.subtitle" style="text-align: center !important;"></a-alert>
+      </a-tooltip>
+      <a-tooltip v-else :title="`正在批量下载本页种子`">
+        <a-alert :message="`本页抓取到种子${torrents.length}个，准备下载${url_list.length}个种子`"
+                 style="text-align: center !important;"></a-alert>
       </a-tooltip>
       <a-collapse
           v-model:activeKey="activeKey"
