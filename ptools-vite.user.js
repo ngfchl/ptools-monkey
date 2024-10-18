@@ -147,6 +147,7 @@
 // @match        https://hdbao.cc/*
 // @match        https://invites.fun/*
 // @match        https://www.52movie.top/*
+// @match        https://lemonhd.club/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.12/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
