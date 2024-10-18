@@ -169,6 +169,7 @@ export default defineConfig({
                     'https://hdbao.cc/*',
                     'https://invites.fun/*',
                     'https://www.52movie.top/*',
+                    'https://lemonhd.club/*',
                 ],
             },
             build: {
