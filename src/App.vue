@@ -785,9 +785,9 @@ onBeforeMount(async () => {
       if (!sessionStorage.getItem('website')) {
         await getSite()
       }
+      await init_button()
       window.addEventListener('load', async () => {
         await getDownloaders()
-        await init_button()
       })
       init.value++
     }
