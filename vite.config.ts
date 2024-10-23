@@ -171,6 +171,7 @@ export default defineConfig({
                     'https://www.52movie.top/*',
                     'https://lemonhd.club/*',
                     'https://pt.hdclone.org/*',
+                    'https://www.tleechreload.org/*',
                 ],
             },
             build: {
