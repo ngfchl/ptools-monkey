@@ -202,6 +202,12 @@ async function getSite() {
       onload: function (response) {
         let res = response.response
         console.log(res)
+        if (res.detail && res.detail.toLowerCase() == 'unauthorized') {
+          let msg = "请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！";
+          console.warn(msg)
+          message.warning(msg, 100000)
+          resolve(false)
+        }
         if (res.code === 0) {
           console.log(res.msg)
           resolve(false)
@@ -780,15 +786,17 @@ onBeforeMount(async () => {
     // 最顶层才加载
     if (window.top != window.self) return;
     if (!checkServer()) return;
+    let checkAuth = false;
     // 只加载一次
     while (init.value < 1) {
       if (!sessionStorage.getItem('website')) {
-        await getSite()
+        checkAuth = await getSite()
+      }
+      if (!checkAuth) {
+        return
       }
       await init_button()
-      window.addEventListener('load', async () => {
-        await getDownloaders()
-      })
+      await getDownloaders()
       init.value++
     }
   } catch (error) {
@@ -976,7 +984,8 @@ onBeforeMount(async () => {
           </a-input-group>
         </a-form-item>
         <a-form-item>
-          <a-input v-model:value.lazy="token" autofocus label="Token" placeholder="安全Token" style="width: 300px;"/>
+          <a-input v-model:value.lazy="token" autofocus label="Token" placeholder="安全Token"
+                   style="width: 300px;text-align: center;"/>
         </a-form-item>
         <a-form-item>
           <a-button style="width: 300px;" type="primary" @click="handleSaveServer">保存</a-button>
