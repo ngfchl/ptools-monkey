@@ -149,7 +149,6 @@
 // @match        https://www.52movie.top/*
 // @match        https://lemonhd.club/*
 // @match        https://pt.hdclone.org/*
-// @match        https://www.tleechreload.org/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.12/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
@@ -169,7 +168,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-884c3fef.js"(exports, module) {
+    "main-e970f603.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -36767,12 +36766,6 @@ summary tabindex target title type usemap value width wmode wrap`;
                 onload: function(response) {
                   let res = response.response;
                   console.log(res);
-                  if (res.detail && res.detail.toLowerCase() == "unauthorized") {
-                    let msg = "请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！";
-                    console.warn(msg);
-                    message.warning(msg, 1e5);
-                    resolve(false);
-                  }
                   if (res.code === 0) {
                     console.log(res.msg);
                     resolve(false);
@@ -37235,16 +37228,14 @@ summary tabindex target title type usemap value width wmode wrap`;
                 return;
               if (!checkServer())
                 return;
-              let checkAuth = false;
               while (init.value < 1) {
                 if (!sessionStorage.getItem("website")) {
-                  checkAuth = await getSite();
+                  await getSite();
                 }
-                if (!checkAuth) {
-                  return;
-                }
-                await init_button();
-                await getDownloaders();
+                window.addEventListener("load", async () => {
+                  await getDownloaders();
+                  await init_button();
+                });
                 init.value++;
               }
             } catch (error) {
@@ -37525,7 +37516,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                             autofocus: "",
                             label: "Token",
                             placeholder: "安全Token",
-                            style: { "width": "300px", "text-align": "center" }
+                            style: { "width": "300px" }
                           }, null, 8, ["value"])
                         ]),
                         _: 1
