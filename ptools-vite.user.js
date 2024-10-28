@@ -149,6 +149,7 @@
 // @match        https://www.52movie.top/*
 // @match        https://lemonhd.club/*
 // @match        https://pt.hdclone.org/*
+// @match        https://www.tleechreload.org/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.12/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
@@ -168,7 +169,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-e970f603.js"(exports, module) {
+    "main-07d2f922.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -36690,10 +36691,13 @@ summary tabindex target title type usemap value width wmode wrap`;
           const torrent_detail_repeat = vue.ref(false);
           const open = vue.ref(false);
           const categories = vue.ref([]);
+          const fallback_image = vue.ref("https://picsum.photos/100/100/?random");
           const cookie = vue.ref("");
           const url_list = vue.ref([]);
           const modal_title = vue.ref("下载到");
           const singleTorrent = vue.ref(null);
+          const mySiteId = vue.ref(0);
+          const siteInfo = vue.ref(null);
           const showModal = () => {
             if (downloaders.value.length <= 0) {
               message.warning("没有可用的下载器！请先在收割机中添加！");
@@ -36723,14 +36727,14 @@ summary tabindex target title type usemap value width wmode wrap`;
               console.log("当前为种子详情页");
               torrent_detail_page.value = true;
               await get_torrent_detail();
-              let hash_string = torrents.value[0].hash_string;
-              console.log(hash_string);
-              if (!hash_string) {
-                message.warning("未获取到 Hash_String！");
+              let tid = torrents.value[0].tid;
+              console.log(tid);
+              if (!tid) {
+                message.warning("未获取到种子 id！");
                 return;
               }
               torrent_detail_repeat.value = true;
-              await repeat(hash_string);
+              await repeat(tid);
             }
             if (location.pathname.search(/torrents\D*$/) > 0 || location.pathname.search(/t$/) > 0 || location.pathname.endsWith("/Torrents") || location.pathname.includes("/music.php") || location.pathname.includes("/special.php") || location.pathname.includes("/live.php") || location.pathname.includes("/torrents.php")) {
               console.log("当前为种子列表页");
@@ -36748,6 +36752,9 @@ summary tabindex target title type usemap value width wmode wrap`;
             }
           }
           async function getSite() {
+            if (mySiteId.value > 0 && siteInfo.value) {
+              return;
+            }
             console.log(api2.value);
             const path2 = "api/auth/monkey/get_site/";
             return new Promise((resolve, reject) => {
@@ -36766,12 +36773,20 @@ summary tabindex target title type usemap value width wmode wrap`;
                 onload: function(response) {
                   let res = response.response;
                   console.log(res);
-                  if (res.code === 0) {
-                    console.log(res.msg);
+                  if (res.detail && res.detail.toLowerCase() == "unauthorized") {
+                    let msg = "请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！";
+                    console.warn(msg);
+                    message.warning(msg, 1e5);
                     resolve(false);
                   }
-                  sessionStorage.setItem("website", JSON.stringify(res.data.website));
-                  sessionStorage.setItem("mySite", JSON.stringify(res.data.mysite));
+                  if (res.code === 0) {
+                    console.log(res.msg);
+                    resolve(true);
+                  }
+                  mySiteId.value = res.data.mysite;
+                  siteInfo.value = JSON.parse(localStorage.getItem("website"));
+                  localStorage.setItem("website", JSON.stringify(res.data.website));
+                  localStorage.setItem("mySite", JSON.stringify(res.data.mysite));
                   resolve(res.data);
                 },
                 onerror: function() {
@@ -36798,21 +36813,19 @@ summary tabindex target title type usemap value width wmode wrap`;
             });
           }
           async function getSiteData() {
-            let site_info = JSON.parse(sessionStorage.getItem("website"));
-            let mySiteId = sessionStorage.getItem("mySite");
-            console.log(site_info);
-            if (site_info === false) {
+            console.log(siteInfo.value);
+            if (siteInfo.value === false) {
               message.error("收割机服务器连接失败！");
               return false;
             }
-            console.log(site_info.my_uid_rule);
+            console.log(siteInfo.value.my_uid_rule);
             let user_agent = window.navigator.userAgent;
             let cookie2 = await getCookie();
             if (!cookie2 && !document.location.host.includes("m-team")) {
               message.error("Cookie获取失败，请使用Beta版油猴（红色图标的油猴）！");
               return false;
             }
-            let href = document.evaluate(site_info.my_uid_rule, document).iterateNext().textContent;
+            let href = document.evaluate(siteInfo.value.my_uid_rule, document).iterateNext().textContent;
             console.log(href);
             if (!href) {
               console.log("获取 UID 出错啦！");
@@ -36830,12 +36843,12 @@ summary tabindex target title type usemap value width wmode wrap`;
               message.error("用户ID获取失败！");
               return false;
             }
-            let data = `user_id=${user_id}&site=${site_info.name}&cookie=${cookie2}&user_agent=${user_agent}`;
+            let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie2}&user_agent=${user_agent}`;
             if (mySiteId != "0") {
               data += `&id=${mySiteId}`;
             }
             if (mySiteId == "0") {
-              data += `&nickname=${site_info.name}`;
+              data += `&nickname=${siteInfo.value.name}`;
             }
             let passkey = getPasskey();
             if (passkey != false) {
@@ -36851,8 +36864,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
           const getPasskey = () => {
             try {
-              let site_info = JSON.parse(sessionStorage.getItem("website"));
-              let passkey = document.evaluate(site_info.my_passkey_rule, document).iterateNext().textContent;
+              let passkey = document.evaluate(siteInfo.value.my_passkey_rule, document).iterateNext().textContent;
               return passkey.trim();
             } catch (e2) {
               console.error(e2);
@@ -36861,8 +36873,7 @@ summary tabindex target title type usemap value width wmode wrap`;
           };
           const getTimeJoin = () => {
             try {
-              let site_info = JSON.parse(sessionStorage.getItem("website"));
-              let time_join = document.evaluate(site_info.my_time_join_rule, document).iterateNext().textContent;
+              let time_join = document.evaluate(siteInfo.value.my_time_join_rule, document).iterateNext().textContent;
               return time_join.trim().replace("T", " ").replace("+08:00", "").match(/\d{4}\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/)[0];
             } catch (e2) {
               console.error(e2);
@@ -36915,34 +36926,29 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
           const torrents = vue.ref([]);
           async function get_torrent_list() {
-            let o2 = sessionStorage.getItem("website");
-            if (!o2) {
-              await getSite();
-            }
             torrents.value.length = 0;
-            let site_info = JSON.parse(o2);
-            let torrent_list = xpath(site_info.torrents_rule.replace("]/tr", "]/tbody/tr"), document);
+            let torrent_list = xpath(siteInfo.value.torrents_rule.replace("]/tr", "]/tbody/tr"), document);
             console.log("获取到种子数量：", torrent_list.snapshotLength);
             for (let i2 = 0; i2 <= torrent_list.snapshotLength; i2++) {
               try {
                 let torrent_info = torrent_list.snapshotItem(i2);
                 if (!torrent_info)
                   continue;
-                let title = xpath(site_info.torrent_title_rule, torrent_info).snapshotItem(0);
-                let category = xpath(site_info.torrent_category_rule, torrent_info).snapshotItem(0);
-                let completers = xpath(site_info.torrent_completers_rule, torrent_info).snapshotItem(0);
-                let detail_url = xpath(site_info.torrent_detail_url_rule, torrent_info).snapshotItem(0);
-                let hr = xpath(site_info.torrent_hr_rule, torrent_info).snapshotItem(0);
-                let leechers = xpath(site_info.torrent_leechers_rule, torrent_info).snapshotItem(0);
-                let magnet_url = xpath(site_info.torrent_magnet_url_rule, torrent_info).snapshotItem(0);
-                let poster = xpath(site_info.torrent_poster_rule, torrent_info).snapshotItem(0);
-                let published = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0);
-                let sale_expire = xpath(site_info.torrent_sale_expire_rule, torrent_info).snapshotItem(0);
-                let sale = xpath(site_info.torrent_sale_rule, torrent_info).snapshotItem(0);
-                let seeders = xpath(site_info.torrent_seeders_rule, torrent_info).snapshotItem(0);
-                let size_items = xpath(site_info.torrent_size_rule, torrent_info);
-                let subtitle = xpath(site_info.torrent_subtitle_rule, torrent_info).snapshotItem(0);
-                let tags = xpath(site_info.torrent_tags_rule, torrent_info);
+                let title = xpath(siteInfo.value.torrent_title_rule, torrent_info).snapshotItem(0);
+                let category = xpath(siteInfo.value.torrent_category_rule, torrent_info).snapshotItem(0);
+                let completers = xpath(siteInfo.value.torrent_completers_rule, torrent_info).snapshotItem(0);
+                let detail_url = xpath(siteInfo.value.torrent_detail_url_rule, torrent_info).snapshotItem(0);
+                let hr = xpath(siteInfo.value.torrent_hr_rule, torrent_info).snapshotItem(0);
+                let leechers = xpath(siteInfo.value.torrent_leechers_rule, torrent_info).snapshotItem(0);
+                let magnet_url = xpath(siteInfo.value.torrent_magnet_url_rule, torrent_info).snapshotItem(0);
+                let poster = xpath(siteInfo.value.torrent_poster_rule, torrent_info).snapshotItem(0);
+                let published = xpath(siteInfo.value.torrent_release_rule, torrent_info).snapshotItem(0);
+                let sale_expire = xpath(siteInfo.value.torrent_sale_expire_rule, torrent_info).snapshotItem(0);
+                let sale = xpath(siteInfo.value.torrent_sale_rule, torrent_info).snapshotItem(0);
+                let seeders = xpath(siteInfo.value.torrent_seeders_rule, torrent_info).snapshotItem(0);
+                let size_items = xpath(siteInfo.value.torrent_size_rule, torrent_info);
+                let subtitle = xpath(siteInfo.value.torrent_subtitle_rule, torrent_info).snapshotItem(0);
+                let tags = xpath(siteInfo.value.torrent_tags_rule, torrent_info);
                 console.log(detail_url);
                 if (!detail_url)
                   continue;
@@ -36953,7 +36959,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                   continue;
                 }
                 if (!magnet_url) {
-                  magnet_url = site_info.page_download.replace("{}", tid);
+                  magnet_url = siteInfo.value.page_download.replace("{}", tid);
                   if (magnet_url.includes("{}")) {
                     magnet_url = magnet_url.replace("&passkey={}", "");
                   }
@@ -36992,7 +36998,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                   poster: poster ? poster.textContent : "",
                   tags: tags.snapshotLength > 0 ? tag.join() : "",
                   tid,
-                  site_id: site_info.name
+                  site_id: siteInfo.value.name
                 };
                 torrents.value.push(torrent);
               } catch (e2) {
@@ -37003,21 +37009,20 @@ summary tabindex target title type usemap value width wmode wrap`;
           }
           async function get_torrent_detail() {
             torrents.value.length = 0;
-            let site_info = JSON.parse(sessionStorage.getItem("website"));
-            let title = xpath(site_info.detail_title_rule, document).snapshotItem(0);
-            let subtitle = xpath(site_info.detail_subtitle_rule, document).snapshotItem(0);
-            let magnet_url = xpath(site_info.detail_download_url_rule, document).snapshotItem(0);
-            let size = xpath(site_info.detail_size_rule, document).snapshotItem(0);
-            let category = xpath(site_info.detail_category_rule, document).snapshotItem(0);
-            let files_count = xpath(site_info.detail_count_files_rule, document).snapshotItem(0);
-            let hash_string = xpath(site_info.detail_hash_rule, document).snapshotItem(0);
-            let sale_status = xpath(site_info.detail_free_rule, document).snapshotItem(0);
-            let sale_expire = xpath(site_info.detail_free_expire_rule, document).snapshotItem(0);
-            let douban_url = xpath(site_info.detail_douban_rule, document).snapshotItem(0);
-            let imdb = xpath(site_info.detail_imdb_rule, document).snapshotItem(0);
-            let poster = xpath(site_info.detail_poster_rule, document).snapshotItem(0);
-            let tags = xpath(site_info.detail_tags_rule, document);
-            let hr = xpath(site_info.detail_hr_rule, document).snapshotItem(0);
+            let title = xpath(siteInfo.value.detail_title_rule, document).snapshotItem(0);
+            let subtitle = xpath(siteInfo.value.detail_subtitle_rule, document).snapshotItem(0);
+            let magnet_url = xpath(siteInfo.value.detail_download_url_rule, document).snapshotItem(0);
+            let size = xpath(siteInfo.value.detail_size_rule, document).snapshotItem(0);
+            let category = xpath(siteInfo.value.detail_category_rule, document).snapshotItem(0);
+            let files_count = xpath(siteInfo.value.detail_count_files_rule, document).snapshotItem(0);
+            let hash_string = xpath(siteInfo.value.detail_hash_rule, document).snapshotItem(0);
+            let sale_status = xpath(siteInfo.value.detail_free_rule, document).snapshotItem(0);
+            let sale_expire = xpath(siteInfo.value.detail_free_expire_rule, document).snapshotItem(0);
+            let douban_url = xpath(siteInfo.value.detail_douban_rule, document).snapshotItem(0);
+            let imdb = xpath(siteInfo.value.detail_imdb_rule, document).snapshotItem(0);
+            let poster = xpath(siteInfo.value.detail_poster_rule, document).snapshotItem(0);
+            let tags = xpath(siteInfo.value.detail_tags_rule, document);
+            let hr = xpath(siteInfo.value.detail_hr_rule, document).snapshotItem(0);
             let tid = location.search.match(/id=(\d+)/)[1];
             let tag = [];
             for (let i2 = 0; i2 < tags.snapshotLength; i2++) {
@@ -37025,7 +37030,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             }
             let torrent = {
               tid,
-              site_id: site_info.id,
+              site_id: siteInfo.value.id,
               title: title ? title.textContent.trim() : "",
               subtitle: subtitle ? subtitle.textContent.trim() : "",
               size: size ? size.textContent.trim() : "",
@@ -37129,14 +37134,14 @@ summary tabindex target title type usemap value width wmode wrap`;
             console.log(url_list.value);
           };
           const push_torrent = async (downloader_id, category) => {
-            let mySiteId = sessionStorage.getItem("mySite");
+            let mySiteId2 = localStorage.getItem("mySite");
             await generate_magnet_url(false);
             console.log(url_list.value);
             if (url_list.value.length <= 0) {
               message.error("没有抓到种子链接！");
               return;
             }
-            let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(",")}`;
+            let data = `site=${mySiteId2}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(",")}`;
             _GM_xmlhttpRequest({
               url: `${api2.value}api/option/push_torrent?${data}`,
               method: "GET",
@@ -37157,8 +37162,7 @@ summary tabindex target title type usemap value width wmode wrap`;
             });
             open.value = false;
           };
-          async function repeat(hash_string) {
-            let site_info = JSON.parse(sessionStorage.getItem("website"));
+          async function repeat(tid) {
             _GM_xmlhttpRequest({
               url: `${api2.value}api/auth/monkey/iyuu`,
               method: "POST",
@@ -37167,7 +37171,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                 "Content-Type": "application/x-www-form-urlencoded",
                 Authorization: `Bearer ${token2.value}`
               },
-              data: `hash_string=${hash_string}&site=${site_info.name}`,
+              data: `torrent_id=${tid}&site_id=${localStorage.getItem("mySite")}`,
               onload: function(response) {
                 let res = response.response;
                 console.log(res);
@@ -37224,18 +37228,19 @@ summary tabindex target title type usemap value width wmode wrap`;
           const init = vue.ref(0);
           vue.onBeforeMount(async () => {
             try {
-              if (window.top != window.self)
+              if (window.top != window.self || !checkServer())
                 return;
-              if (!checkServer())
-                return;
+              let checkAuth = false;
               while (init.value < 1) {
-                if (!sessionStorage.getItem("website")) {
-                  await getSite();
+                if (mySiteId.value <= 0 || !siteInfo.value) {
+                  checkAuth = await getSite();
                 }
-                window.addEventListener("load", async () => {
-                  await getDownloaders();
-                  await init_button();
-                });
+                console.log(checkAuth);
+                if (!checkAuth) {
+                  return;
+                }
+                await init_button();
+                await getDownloaders();
                 init.value++;
               }
             } catch (error) {
@@ -37261,11 +37266,11 @@ summary tabindex target title type usemap value width wmode wrap`;
             const _component_a_drawer = __unplugin_components_15;
             return vue.openBlock(), vue.createElementBlock("div", _hoisted_1, [
               vue.createVNode(_component_a_image, {
-                fallback: `${api2.value}favicon.png`,
                 preview: false,
                 class: "image",
+                fallback: "https://picsum.photos/200/200/?random",
                 src: "https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E5%B0%91%E5%A5%B3%E5%86%99%E7%9C%9F5"
-              }, null, 8, ["fallback"]),
+              }),
               vue.createVNode(_component_a_space, {
                 align: "center",
                 style: { "width": "100%" }
@@ -37516,7 +37521,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                             autofocus: "",
                             label: "Token",
                             placeholder: "安全Token",
-                            style: { "width": "300px" }
+                            style: { "width": "300px", "text-align": "center" }
                           }, null, 8, ["value"])
                         ]),
                         _: 1
@@ -37565,8 +37570,8 @@ summary tabindex target title type usemap value width wmode wrap`;
                 ]),
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_a_card, {
-                    style: { "width": "100%" },
-                    title: "可辅种站点"
+                    title: `可辅种站点: ${repeat_info.value.url_list.length}`,
+                    style: { "width": "100%" }
                   }, {
                     default: vue.withCtx(() => [
                       vue.createVNode(_component_a_space, {
@@ -37585,9 +37590,9 @@ summary tabindex target title type usemap value width wmode wrap`;
                             }, {
                               icon: vue.withCtx(() => [
                                 vue.createVNode(_component_a_image, {
-                                  fallback: `${api2.value}${info.site.logo}`,
+                                  fallback: fallback_image.value,
                                   preview: false,
-                                  src: info.site.logo,
+                                  src: info.site.logo.replace("http://", "https://"),
                                   width: 13
                                 }, null, 8, ["fallback", "src"])
                               ]),
@@ -37602,8 +37607,10 @@ summary tabindex target title type usemap value width wmode wrap`;
                       })
                     ]),
                     _: 1
-                  }),
-                  vue.createVNode(_component_a_card, { title: "可发布站点" }, {
+                  }, 8, ["title"]),
+                  vue.createVNode(_component_a_card, {
+                    title: `可发布站点: ${repeat_info.value.can_list.length}`
+                  }, {
                     default: vue.withCtx(() => [
                       vue.createVNode(_component_a_space, {
                         align: "center",
@@ -37621,8 +37628,8 @@ summary tabindex target title type usemap value width wmode wrap`;
                             }, {
                               icon: vue.withCtx(() => [
                                 vue.createVNode(_component_a_image, {
-                                  fallback: `${api2.value}favicon.png`,
-                                  src: site.logo,
+                                  fallback: fallback_image.value,
+                                  src: site.logo.replace("http://", "https://"),
                                   width: 13
                                 }, null, 8, ["fallback", "src"])
                               ]),
@@ -37637,7 +37644,7 @@ summary tabindex target title type usemap value width wmode wrap`;
                       })
                     ]),
                     _: 1
-                  })
+                  }, 8, ["title"])
                 ]),
                 _: 1
               }, 8, ["open"])
