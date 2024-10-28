@@ -186,7 +186,7 @@ async function init_button() {
  * @returns {Promise<unknown>}
  */
 async function getSite() {
-  if (mySiteId.value > 0 && !siteInfo.value) {
+  if (mySiteId.value > 0 && siteInfo.value) {
     return
   }
   console.log(api.value)
@@ -217,7 +217,7 @@ async function getSite() {
         }
         if (res.code === 0) {
           console.log(res.msg)
-          resolve(false)
+          resolve(true)
         }
         mySiteId.value = res.data.mysite
         siteInfo.value = JSON.parse(localStorage.getItem('website')!)
@@ -783,17 +783,17 @@ const init = ref(0)
 onBeforeMount(async () => {
   try {
     // 最顶层才加载
-    if (window.top != window.self) return;
-    if (!checkServer()) return;
+    if (window.top != window.self || !checkServer()) return;
     let checkAuth = false;
     // 只加载一次
     while (init.value < 1) {
       if (mySiteId.value <= 0 || !siteInfo.value) {
         checkAuth = await getSite()
       }
-      // if (!checkAuth) {
-      //   return
-      // }
+      console.log(checkAuth)
+      if (!checkAuth) {
+        return
+      }
       await init_button()
       await getDownloaders()
       init.value++
