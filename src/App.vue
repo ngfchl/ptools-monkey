@@ -86,10 +86,14 @@ const torrent_detail_page = ref(false)
 const torrent_detail_repeat = ref(false)
 const open = ref<boolean>(false);
 const categories = ref<Category[]>([])
+const fallback_image = ref<string>('https://picsum.photos/100/100/?random')
 const cookie = ref<string>('')
 const url_list = ref<string[]>([])
 const modal_title = ref<string>('下载到')
 const singleTorrent = ref<Torrent>(null)
+const mySiteId = ref<number>(0);
+const siteInfo = ref<Map>(null);
+
 const showModal = () => {
   if (downloaders.value.length <= 0) {
     message.warning('没有可用的下载器！请先在收割机中添加！')
@@ -130,14 +134,14 @@ async function init_button() {
     torrent_detail_page.value = true
     await get_torrent_detail()
     // await sync_torrents()
-    let hash_string = torrents.value[0].hash_string
-    console.log(hash_string)
-    if (!hash_string) {
-      message.warning('未获取到 Hash_String！')
+    let tid = torrents.value[0].tid
+    console.log(tid)
+    if (!tid) {
+      message.warning('未获取到种子 id！')
       return
     }
     torrent_detail_repeat.value = true
-    await repeat(hash_string)
+    await repeat(tid)
   }
 
   if (location.pathname.search(/torrents\D*$/) > 0 ||
@@ -182,6 +186,9 @@ async function init_button() {
  * @returns {Promise<unknown>}
  */
 async function getSite() {
+  if (mySiteId.value > 0 && !siteInfo.value) {
+    return
+  }
   console.log(api.value)
   const path = "api/auth/monkey/get_site/"
   return new Promise((resolve, reject) => {
@@ -212,8 +219,10 @@ async function getSite() {
           console.log(res.msg)
           resolve(false)
         }
-        sessionStorage.setItem('website', JSON.stringify(res.data.website))
-        sessionStorage.setItem('mySite', JSON.stringify(res.data.mysite))
+        mySiteId.value = res.data.mysite
+        siteInfo.value = JSON.parse(localStorage.getItem('website')!)
+        localStorage.setItem('website', JSON.stringify(res.data.website))
+        localStorage.setItem('mySite', JSON.stringify(res.data.mysite))
         resolve(res.data)
       },
       onerror: function () {
@@ -252,14 +261,13 @@ async function getCookie() {
  * @returns
  */
 async function getSiteData() {
-  let site_info = JSON.parse(sessionStorage.getItem('website')!)
-  let mySiteId = sessionStorage.getItem('mySite')
-  console.log(site_info)
-  if (site_info === false) {
+
+  console.log(siteInfo.value)
+  if (siteInfo.value === false) {
     message.error('收割机服务器连接失败！')
     return false;
   }
-  console.log(site_info.my_uid_rule)
+  console.log(siteInfo.value.my_uid_rule)
   //获取cookie与useragent
   let user_agent = window.navigator.userAgent
   let cookie = await getCookie()
@@ -268,7 +276,7 @@ async function getSiteData() {
     return false
   }
   //获取UID
-  let href = document.evaluate(site_info.my_uid_rule, document).iterateNext()!.textContent
+  let href = document.evaluate(siteInfo.value.my_uid_rule, document).iterateNext()!.textContent
   console.log(href)
   if (!href) {
     console.log('获取 UID 出错啦！')
@@ -286,12 +294,12 @@ async function getSiteData() {
     message.error('用户ID获取失败！')
     return false
   }
-  let data = `user_id=${user_id}&site=${site_info.name}&cookie=${cookie}&user_agent=${user_agent}`
+  let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}`
   if (mySiteId != '0') {
     data += `&id=${mySiteId}`
   }
   if (mySiteId == '0') {
-    data += `&nickname=${site_info.name}`
+    data += `&nickname=${siteInfo.value.name}`
   }
   let passkey = getPasskey()
   if (passkey != false) {
@@ -311,8 +319,7 @@ async function getSiteData() {
  */
 const getPasskey = () => {
   try {
-    let site_info = JSON.parse(sessionStorage.getItem('website')!)
-    let passkey = document.evaluate(site_info.my_passkey_rule, document).iterateNext()!.textContent
+    let passkey = document.evaluate(siteInfo.value.my_passkey_rule, document).iterateNext()!.textContent
     return passkey!.trim()
   } catch (e) {
     console.error(e)
@@ -324,8 +331,7 @@ const getPasskey = () => {
  */
 const getTimeJoin = () => {
   try {
-    let site_info = JSON.parse(sessionStorage.getItem('website')!)
-    let time_join = document.evaluate(site_info.my_time_join_rule, document).iterateNext()!.textContent
+    let time_join = document.evaluate(siteInfo.value.my_time_join_rule, document).iterateNext()!.textContent
     return time_join!.trim()
         .replace('T', ' ')
         .replace('+08:00', '')
@@ -394,34 +400,29 @@ function xpath(query: string, node: Node) {
 const torrents = ref<any>([])
 
 async function get_torrent_list() {
-  let o = sessionStorage.getItem('website')
-  if (!o) {
-    await getSite()
-  }
   torrents.value.length = 0
-  let site_info = JSON.parse(o!)
-  let torrent_list = xpath(site_info.torrents_rule.replace("]/tr", "]/tbody/tr"), document)
+  let torrent_list = xpath(siteInfo.value.torrents_rule.replace("]/tr", "]/tbody/tr"), document)
   console.log('获取到种子数量：', torrent_list.snapshotLength)
   for (let i = 0; i <= torrent_list.snapshotLength; i++) {
     try {
       let torrent_info = torrent_list.snapshotItem(i)
       // 未获取到数据节点，pass
       if (!torrent_info) continue
-      let title = xpath(site_info.torrent_title_rule, torrent_info).snapshotItem(0)
-      let category = xpath(site_info.torrent_category_rule, torrent_info).snapshotItem(0)
-      let completers = xpath(site_info.torrent_completers_rule, torrent_info).snapshotItem(0)
-      let detail_url = xpath(site_info.torrent_detail_url_rule, torrent_info).snapshotItem(0)
-      let hr = xpath(site_info.torrent_hr_rule, torrent_info).snapshotItem(0)
-      let leechers = xpath(site_info.torrent_leechers_rule, torrent_info).snapshotItem(0)
-      let magnet_url = xpath(site_info.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
-      let poster = xpath(site_info.torrent_poster_rule, torrent_info).snapshotItem(0)
-      let published = xpath(site_info.torrent_release_rule, torrent_info).snapshotItem(0)
-      let sale_expire = xpath(site_info.torrent_sale_expire_rule, torrent_info).snapshotItem(0)
-      let sale = xpath(site_info.torrent_sale_rule, torrent_info).snapshotItem(0)
-      let seeders = xpath(site_info.torrent_seeders_rule, torrent_info).snapshotItem(0)
-      let size_items = xpath(site_info.torrent_size_rule, torrent_info)
-      let subtitle = xpath(site_info.torrent_subtitle_rule, torrent_info).snapshotItem(0)
-      let tags = xpath(site_info.torrent_tags_rule, torrent_info)
+      let title = xpath(siteInfo.value.torrent_title_rule, torrent_info).snapshotItem(0)
+      let category = xpath(siteInfo.value.torrent_category_rule, torrent_info).snapshotItem(0)
+      let completers = xpath(siteInfo.value.torrent_completers_rule, torrent_info).snapshotItem(0)
+      let detail_url = xpath(siteInfo.value.torrent_detail_url_rule, torrent_info).snapshotItem(0)
+      let hr = xpath(siteInfo.value.torrent_hr_rule, torrent_info).snapshotItem(0)
+      let leechers = xpath(siteInfo.value.torrent_leechers_rule, torrent_info).snapshotItem(0)
+      let magnet_url = xpath(siteInfo.value.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
+      let poster = xpath(siteInfo.value.torrent_poster_rule, torrent_info).snapshotItem(0)
+      let published = xpath(siteInfo.value.torrent_release_rule, torrent_info).snapshotItem(0)
+      let sale_expire = xpath(siteInfo.value.torrent_sale_expire_rule, torrent_info).snapshotItem(0)
+      let sale = xpath(siteInfo.value.torrent_sale_rule, torrent_info).snapshotItem(0)
+      let seeders = xpath(siteInfo.value.torrent_seeders_rule, torrent_info).snapshotItem(0)
+      let size_items = xpath(siteInfo.value.torrent_size_rule, torrent_info)
+      let subtitle = xpath(siteInfo.value.torrent_subtitle_rule, torrent_info).snapshotItem(0)
+      let tags = xpath(siteInfo.value.torrent_tags_rule, torrent_info)
       console.log(detail_url)
       if (!detail_url) continue
       let tid = detail_url!.textContent!.match(/id=(\d+)/)![1]
@@ -433,7 +434,7 @@ async function get_torrent_list() {
       }
 
       if (!magnet_url) {
-        magnet_url = site_info.page_download.replace("{}", tid)
+        magnet_url = siteInfo.value.page_download.replace("{}", tid)
         if (magnet_url.includes('{}')) {
           magnet_url = magnet_url.replace("&passkey={}", "")
         }
@@ -472,7 +473,7 @@ async function get_torrent_list() {
         poster: poster ? poster.textContent : '',
         tags: tags.snapshotLength > 0 ? tag.join() : '',
         tid: tid,
-        site_id: site_info.name,
+        site_id: siteInfo.value.name,
       }
       torrents.value.push(torrent)
     } catch (e) {
@@ -487,21 +488,20 @@ async function get_torrent_list() {
  */
 async function get_torrent_detail() {
   torrents.value.length = 0
-  let site_info = JSON.parse(sessionStorage.getItem('website')!);
-  let title = xpath(site_info.detail_title_rule, document).snapshotItem(0)
-  let subtitle = xpath(site_info.detail_subtitle_rule, document).snapshotItem(0)
-  let magnet_url = xpath(site_info.detail_download_url_rule, document).snapshotItem(0)
-  let size = xpath(site_info.detail_size_rule, document).snapshotItem(0)
-  let category = xpath(site_info.detail_category_rule, document).snapshotItem(0)
-  let files_count = xpath(site_info.detail_count_files_rule, document).snapshotItem(0)
-  let hash_string = xpath(site_info.detail_hash_rule, document).snapshotItem(0)
-  let sale_status = xpath(site_info.detail_free_rule, document).snapshotItem(0)
-  let sale_expire = xpath(site_info.detail_free_expire_rule, document).snapshotItem(0)
-  let douban_url = xpath(site_info.detail_douban_rule, document).snapshotItem(0)
-  let imdb = xpath(site_info.detail_imdb_rule, document).snapshotItem(0)
-  let poster = xpath(site_info.detail_poster_rule, document).snapshotItem(0)
-  let tags = xpath(site_info.detail_tags_rule, document)
-  let hr = xpath(site_info.detail_hr_rule, document).snapshotItem(0)
+  let title = xpath(siteInfo.value.detail_title_rule, document).snapshotItem(0)
+  let subtitle = xpath(siteInfo.value.detail_subtitle_rule, document).snapshotItem(0)
+  let magnet_url = xpath(siteInfo.value.detail_download_url_rule, document).snapshotItem(0)
+  let size = xpath(siteInfo.value.detail_size_rule, document).snapshotItem(0)
+  let category = xpath(siteInfo.value.detail_category_rule, document).snapshotItem(0)
+  let files_count = xpath(siteInfo.value.detail_count_files_rule, document).snapshotItem(0)
+  let hash_string = xpath(siteInfo.value.detail_hash_rule, document).snapshotItem(0)
+  let sale_status = xpath(siteInfo.value.detail_free_rule, document).snapshotItem(0)
+  let sale_expire = xpath(siteInfo.value.detail_free_expire_rule, document).snapshotItem(0)
+  let douban_url = xpath(siteInfo.value.detail_douban_rule, document).snapshotItem(0)
+  let imdb = xpath(siteInfo.value.detail_imdb_rule, document).snapshotItem(0)
+  let poster = xpath(siteInfo.value.detail_poster_rule, document).snapshotItem(0)
+  let tags = xpath(siteInfo.value.detail_tags_rule, document)
+  let hr = xpath(siteInfo.value.detail_hr_rule, document).snapshotItem(0)
   let tid = location.search.match(/id=(\d+)/)![1]
 
 
@@ -511,7 +511,7 @@ async function get_torrent_detail() {
   }
   let torrent = {
     tid: tid,
-    site_id: site_info.id,
+    site_id: siteInfo.value.id,
     title: title ? title.textContent!.trim() : '',
     subtitle: subtitle ? subtitle.textContent!.trim() : '',
     size: size ? size.textContent!.trim() : '',
@@ -631,7 +631,7 @@ const generate_magnet_url = async (flag: boolean) => {
  * 推送种子到下载器
  */
 const push_torrent = async (downloader_id: number, category: string) => {
-  let mySiteId = sessionStorage.getItem('mySite');
+  let mySiteId = localStorage.getItem('mySite');
   await generate_magnet_url(false)
   console.log(url_list.value)
   if (url_list.value.length <= 0) {
@@ -695,9 +695,8 @@ const sync_torrents = async () => {
  * 辅种助手
  * 获取辅种嘻嘻
  */
-async function repeat(hash_string: string) {
+async function repeat(tid: number) {
 
-  let site_info = JSON.parse(sessionStorage.getItem('website')!);
   GM_xmlhttpRequest({
     url: `${api.value}api/auth/monkey/iyuu`, method: "POST",
     responseType: "json",
@@ -705,7 +704,7 @@ async function repeat(hash_string: string) {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Bearer ${token.value}`,
     },
-    data: `hash_string=${hash_string}&site=${site_info.name}`,
+    data: `torrent_id=${tid}&site_id=${localStorage.getItem('mySite')}`,
     onload: function (response) {
       let res = response.response
       console.log(res)
@@ -789,12 +788,12 @@ onBeforeMount(async () => {
     let checkAuth = false;
     // 只加载一次
     while (init.value < 1) {
-      if (!sessionStorage.getItem('website')) {
+      if (mySiteId.value <= 0 || !siteInfo.value) {
         checkAuth = await getSite()
       }
-      if (!checkAuth) {
-        return
-      }
+      // if (!checkAuth) {
+      //   return
+      // }
       await init_button()
       await getDownloaders()
       init.value++
@@ -809,9 +808,9 @@ onBeforeMount(async () => {
 <template>
   <div class="harvest-wrap">
     <a-image
-        :fallback="`${api}favicon.png`"
         :preview="false"
         class="image"
+        fallback="https://picsum.photos/200/200/?random"
         src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E5%B0%91%E5%A5%B3%E5%86%99%E7%9C%9F5"/>
     <a-space
         align="center"
@@ -1004,7 +1003,7 @@ onBeforeMount(async () => {
           辅种助手
         </a-avatar>
       </template>
-      <a-card style="width: 100%" title="可辅种站点">
+      <a-card :title="`可辅种站点: ${repeat_info!.url_list.length}`" style="width: 100%">
         <a-space align="center" wrap>
           <a-button
               v-for="info in repeat_info!.url_list"
@@ -1017,8 +1016,8 @@ onBeforeMount(async () => {
           >
             <template #icon>
               <a-image
-                  :fallback="`${api}${info.site.logo}`"
-                  :preview="false" :src="info.site.logo"
+                  :fallback="fallback_image"
+                  :preview="false" :src="info.site.logo.replace('http://','https://')"
                   :width="13"
               ></a-image>
             </template>
@@ -1026,7 +1025,7 @@ onBeforeMount(async () => {
           </a-button>
         </a-space>
       </a-card>
-      <a-card title="可发布站点">
+      <a-card :title="`可发布站点: ${repeat_info!.can_list.length}`">
         <a-space align="center" wrap>
           <a-button
               v-for="site in repeat_info!.can_list"
@@ -1036,7 +1035,7 @@ onBeforeMount(async () => {
               size="small" target="_blank">
             <template #icon>
               <a-image
-                  :fallback="`${api}favicon.png`" :src="site.logo"
+                  :fallback="fallback_image" :src="site.logo.replace('http://','https://')"
                   :width="13"
               ></a-image>
             </template>
