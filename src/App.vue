@@ -295,10 +295,10 @@ async function getSiteData() {
     return false
   }
   let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}`
-  if (mySiteId != '0') {
-    data += `&id=${mySiteId}`
+  if (mySiteId.value != '0') {
+    data += `&id=${mySiteId.value}`
   }
-  if (mySiteId == '0') {
+  if (mySiteId.value == '0') {
     data += `&nickname=${siteInfo.value.name}`
   }
   let passkey = getPasskey()
@@ -631,14 +631,13 @@ const generate_magnet_url = async (flag: boolean) => {
  * 推送种子到下载器
  */
 const push_torrent = async (downloader_id: number, category: string) => {
-  let mySiteId = localStorage.getItem('mySite');
   await generate_magnet_url(false)
   console.log(url_list.value)
   if (url_list.value.length <= 0) {
     message.error('没有抓到种子链接！')
     return
   }
-  let data = `site=${mySiteId}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(',')}`
+  let data = `site=${mySiteId.value}&downloader_id=${downloader_id}&category=${category}&url=${url_list.value.join(',')}`
   // message.warning(data)
   GM_xmlhttpRequest({
     url: `${api.value}api/option/push_torrent?${data}`,
@@ -787,7 +786,7 @@ onBeforeMount(async () => {
     let checkAuth = false;
     // 只加载一次
     while (init.value < 1) {
-      if (mySiteId.value <= 0 || !siteInfo.value) {
+      if (!siteInfo.value) {
         checkAuth = await getSite()
       }
       console.log(checkAuth)
