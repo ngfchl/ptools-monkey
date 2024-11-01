@@ -131,6 +131,9 @@ async function init_button() {
       || location.pathname.search(/torrents\D*\d+/) > 0
   ) {
     console.log('当前为种子详情页')
+    if (downloaders.value.length <= 0) {
+      await getDownloaders()
+    }
     torrent_detail_page.value = true
     await get_torrent_detail()
     // await sync_torrents()
@@ -140,6 +143,7 @@ async function init_button() {
       message.warning('未获取到种子 id！')
       return
     }
+
     torrent_detail_repeat.value = true
     await repeat(tid)
   }
@@ -153,6 +157,9 @@ async function init_button() {
       location.pathname.includes('/torrents.php')) {
     console.log('当前为种子列表页')
     torrent_list_page.value = true
+    if (downloaders.value.length <= 0) {
+      await getDownloaders()
+    }
     await get_torrent_list()
     // await sync_torrents()
   }
@@ -204,21 +211,23 @@ async function getSite() {
       method: "GET",
       responseType: "json",
       headers: {
-        Authorization: `Bearer ${token.value}`,
+        Authorization: `Bearer Monkey.${token.value}`,
       },
       onload: function (response) {
+        console.log(response)
         let res = response.response
         console.log(res)
-        if (res.detail && res.detail.toLowerCase() == 'unauthorized') {
-          let msg = "请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！";
-          console.warn(msg)
-          message.warning(msg, 100000)
-          resolve(false)
-        }
         if (res.code === 0) {
           console.log(res.msg)
           resolve(true)
+        } else {
+          let msg = `${res.msg}请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！`;
+          console.warn(msg)
+          message.warning(msg, 100000)
+          resolve(false)
+          return
         }
+
         mySiteId.value = res.data.mysite
         siteInfo.value = JSON.parse(localStorage.getItem('website')!)
         localStorage.setItem('website', JSON.stringify(res.data.website))
@@ -346,7 +355,10 @@ const getTimeJoin = () => {
  * 保存站点信息到收割机
  */
 async function sync_cookie() {
-  await getSite()
+  let flag = await getSite()
+  if (!flag) {
+    return
+  }
   let data = await getSiteData();
   console.log(data)
   if (data) {
@@ -367,7 +379,7 @@ async function send_site_info(data: string) {
       url: url,
       method: "POST", // responseType: "json",
       headers: {
-        Authorization: `Bearer ${token.value}`,
+        Authorization: `Bearer Monkey.${token.value}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       data: data,
@@ -537,7 +549,7 @@ async function getDownloaders() {
   GM_xmlhttpRequest({
     url: `${api.value}api/option/downloaders`, method: "GET", responseType: "json",
     headers: {
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -561,7 +573,7 @@ const test_connect = async (downloader_id: number) => {
     method: "GET",
     responseType: "json",
     headers: {
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -589,7 +601,7 @@ async function getDownloaderCategorise(downloader_id: number) {
     method: "GET",
     responseType: "json",
     headers: {
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -644,7 +656,7 @@ const push_torrent = async (downloader_id: number, category: string) => {
     method: "GET",
     responseType: "json",
     headers: {
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     onload: function (response) {
       let res = response.response
@@ -670,7 +682,7 @@ const sync_torrents = async () => {
     method: "POST",
     // responseType: "json",
     headers: {
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     data: JSON.stringify(torrents.value),
     onload: function (response) {
@@ -701,7 +713,7 @@ async function repeat(tid: number) {
     responseType: "json",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Bearer ${token.value}`,
+      Authorization: `Bearer Monkey.${token.value}`,
     },
     data: `torrent_id=${tid}&site_id=${localStorage.getItem('mySite')}`,
     onload: function (response) {
@@ -720,6 +732,9 @@ async function repeat(tid: number) {
 }
 
 async function download_to() {
+  if (downloaders.value.length <= 0) {
+    await getDownloaders()
+  }
   await get_torrent_detail()
   console.log(torrents.value)
   singleTorrent.value = torrents.value[0]
@@ -729,6 +744,9 @@ async function download_to() {
 }
 
 async function download_all() {
+  if (downloaders.value.length <= 0) {
+    await getDownloaders()
+  }
   await get_torrent_list()
   await generate_magnet_url(false)
   // modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`
@@ -736,6 +754,9 @@ async function download_all() {
 }
 
 async function download_free() {
+  if (downloaders.value.length <= 0) {
+    await getDownloaders()
+  }
   await get_torrent_list()
   await generate_magnet_url(true)
   // modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`
