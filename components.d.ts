@@ -13,8 +13,6 @@ declare module 'vue' {
     ACard: typeof import('ant-design-vue/es')['Card']
     ACollapse: typeof import('ant-design-vue/es')['Collapse']
     ACollapsePanel: typeof import('ant-design-vue/es')['CollapsePanel']
-    ADescriptions: typeof import('ant-design-vue/es')['Descriptions']
-    ADescriptionsItem: typeof import('ant-design-vue/es')['DescriptionsItem']
     ADrawer: typeof import('ant-design-vue/es')['Drawer']
     AForm: typeof import('ant-design-vue/es')['Form']
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
@@ -24,8 +22,6 @@ declare module 'vue' {
     AModal: typeof import('ant-design-vue/es')['Modal']
     ASpace: typeof import('ant-design-vue/es')['Space']
     ASpaceCompact: typeof import('ant-design-vue/es')['Compact']
-    ATag: typeof import('ant-design-vue/es')['Tag']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
-    ATypographyParagraph: typeof import('ant-design-vue/es')['TypographyParagraph']
   }
 }

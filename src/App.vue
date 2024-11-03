@@ -129,6 +129,7 @@ async function init_button() {
       || location.pathname.includes('/views.php')
       || location.pathname.includes('/Torrents/details')
       || location.pathname.search(/torrents\D*\d+/) > 0
+      || location.pathname.search(/t\/\d+/) > 0
   ) {
     console.log('当前为种子详情页')
     if (downloaders.value.length <= 0) {
@@ -154,7 +155,8 @@ async function init_button() {
       location.pathname.includes('/music.php') ||
       location.pathname.includes('/special.php') ||
       location.pathname.includes('/live.php') ||
-      location.pathname.includes('/torrents.php')) {
+      location.pathname.includes('/torrents.php') ||
+      location.pathname.includes('/browse.php')) {
     console.log('当前为种子列表页')
     torrent_list_page.value = true
     if (downloaders.value.length <= 0) {
