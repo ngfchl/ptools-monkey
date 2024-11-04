@@ -90,9 +90,9 @@ const fallback_image = ref<string>('https://picsum.photos/100/100/?random')
 const cookie = ref<string>('')
 const url_list = ref<string[]>([])
 const modal_title = ref<string>('下载到')
-const singleTorrent = ref<Torrent>(null)
-const mySiteId = ref<number>(0);
-const siteInfo = ref<Map>(null);
+const singleTorrent = ref<Torrent>()
+const mySiteId = ref<number>(0)
+const siteInfo = ref();
 
 const showModal = () => {
   if (downloaders.value.length <= 0) {
@@ -190,13 +190,14 @@ async function init_button() {
   }
 }
 
+
 /**
  * 获取站点相关规则并写入本地存储
- * @returns {Promise<unknown>}
+ * @returns
  */
-async function getSite() {
+const getSite = async (): Promise<boolean | null> => {
   if (mySiteId.value > 0 && siteInfo.value) {
-    return
+    return null;
   }
   console.log(api.value)
   const path = "api/auth/monkey/get_site/"
@@ -234,7 +235,7 @@ async function getSite() {
         siteInfo.value = JSON.parse(localStorage.getItem('website')!)
         localStorage.setItem('website', JSON.stringify(res.data.website))
         localStorage.setItem('mySite', JSON.stringify(res.data.mysite))
-        resolve(res.data)
+        resolve(true)
       },
       onerror: function () {
         console.log('服务器连接失败！')
@@ -242,7 +243,7 @@ async function getSite() {
       }
     })
   })
-}
+};
 
 
 /**
@@ -306,10 +307,10 @@ async function getSiteData() {
     return false
   }
   let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}`
-  if (mySiteId.value != '0') {
+  if (mySiteId.value != 0) {
     data += `&id=${mySiteId.value}`
   }
-  if (mySiteId.value == '0') {
+  if (mySiteId.value == 0) {
     data += `&nickname=${siteInfo.value.name}`
   }
   let passkey = getPasskey()
@@ -358,7 +359,8 @@ const getTimeJoin = () => {
  */
 async function sync_cookie() {
   let flag = await getSite()
-  if (!flag) {
+  console.log(flag)
+  if (flag == false) {
     return
   }
   let data = await getSiteData();
@@ -428,7 +430,7 @@ async function get_torrent_list() {
       let detail_url = xpath(siteInfo.value.torrent_detail_url_rule, torrent_info).snapshotItem(0)
       let hr = xpath(siteInfo.value.torrent_hr_rule, torrent_info).snapshotItem(0)
       let leechers = xpath(siteInfo.value.torrent_leechers_rule, torrent_info).snapshotItem(0)
-      let magnet_url = xpath(siteInfo.value.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
+      let magnet_url_node = xpath(siteInfo.value.torrent_magnet_url_rule, torrent_info).snapshotItem(0)
       let poster = xpath(siteInfo.value.torrent_poster_rule, torrent_info).snapshotItem(0)
       let published = xpath(siteInfo.value.torrent_release_rule, torrent_info).snapshotItem(0)
       let sale_expire = xpath(siteInfo.value.torrent_sale_expire_rule, torrent_info).snapshotItem(0)
@@ -442,19 +444,19 @@ async function get_torrent_list() {
       let tid = detail_url!.textContent!.match(/id=(\d+)/)![1]
       // 未获取到种子ID，pass
       console.log(tid)
-      console.log(magnet_url)
+      console.log(magnet_url_node)
       if (!tid) {
         continue
       }
-
-      if (!magnet_url) {
+      let magnet_url;
+      if (!magnet_url_node) {
         magnet_url = siteInfo.value.page_download.replace("{}", tid)
-        if (magnet_url.includes('{}')) {
-          magnet_url = magnet_url.replace("&passkey={}", "")
+        if (magnet_url?.includes('{}')) {
+          magnet_url = magnet_url?.replace("&passkey={}", "")
         }
         console.log(magnet_url)
       } else {
-        magnet_url = magnet_url.textContent
+        magnet_url = magnet_url_node.textContent
       }
       if (!magnet_url.startsWith('http')) {
         magnet_url = `${location.origin}${magnet_url.startsWith('/') ? magnet_url : `/${magnet_url}`}`
@@ -806,7 +808,7 @@ onBeforeMount(async () => {
   try {
     // 最顶层才加载
     if (window.top != window.self || !checkServer()) return;
-    let checkAuth = false;
+    let checkAuth;
     // 只加载一次
     while (init.value < 1) {
       if (!siteInfo.value) {
@@ -947,7 +949,7 @@ onBeforeMount(async () => {
     </a-space>
     <a-modal v-model:open="open" :title="modal_title" @ok="handleOk">
       <a-tooltip v-if="torrents.length <= 1" :title="url_list[0]">
-        <a-alert :message="singleTorrent.subtitle" style="text-align: center !important;"></a-alert>
+        <a-alert :message="singleTorrent?.subtitle" style="text-align: center !important;"></a-alert>
       </a-tooltip>
       <a-tooltip v-else :title="`正在批量下载本页种子`">
         <a-alert :message="`本页抓取到种子${torrents.length}个，准备下载${url_list.length}个种子`"
