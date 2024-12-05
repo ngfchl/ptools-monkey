@@ -178,6 +178,7 @@ export default defineConfig({
                     'https://aither.cc/*',
                     'https://blutopia.cc/*',
                     'https://fearnopeer.com/*',
+                    'https://sunnypt.top/*',
                 ],
             },
             build: {
