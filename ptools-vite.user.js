@@ -160,6 +160,7 @@
 // @match        https://pt.ldoapp.tech/*
 // @match        https://www.ptzone.xyz/*
 // @match        https://pt.pagesecond.cn/*
+// @match        https://lst.gg/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js
 // @grant        GM_addStyle
 // @grant        GM_cookie
