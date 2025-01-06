@@ -182,6 +182,7 @@ export default defineConfig({
                     'https://pt.ldoapp.tech/*',
                     'https://www.ptzone.xyz/*',
                     'https://pt.pagesecond.cn/*',
+                    'https://lst.gg/*',
                 ],
             },
             build: {
