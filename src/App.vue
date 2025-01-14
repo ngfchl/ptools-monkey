@@ -145,8 +145,9 @@ async function init_button() {
       return
     }
 
-    torrent_detail_repeat.value = true
+
     await repeat(tid)
+
   }
 
   if (location.pathname.search(/torrents\D*$/) > 0 ||
@@ -232,7 +233,7 @@ const getSite = async (): Promise<boolean | null> => {
         }
 
         mySiteId.value = res.data.mysite
-        siteInfo.value = JSON.parse(localStorage.getItem('website')!)
+        siteInfo.value = res.data.website
         localStorage.setItem('website', JSON.stringify(res.data.website))
         localStorage.setItem('mySite', JSON.stringify(res.data.mysite))
         resolve(true)
@@ -715,7 +716,10 @@ const sync_torrents = async () => {
  * 获取辅种嘻嘻
  */
 async function repeat(tid: number) {
-
+  console.log(siteInfo.value)
+  if (siteInfo.value && siteInfo.value.iyuu > 0) {
+    torrent_detail_repeat.value = true
+  }
   GM_xmlhttpRequest({
     url: `${api.value}api/auth/monkey/iyuu`, method: "POST",
     responseType: "json",
@@ -865,7 +869,7 @@ onBeforeMount(async () => {
           同步数据
         </a-button>
         <a-button
-            v-if="torrent_list_page" block
+            v-if="torrent_list_page && downloaders.length > 0" block
             size="small"
             @click="download_all"
         >
@@ -875,7 +879,7 @@ onBeforeMount(async () => {
           下载全部
         </a-button>
         <a-button
-            v-if="torrent_list_page" block
+            v-if="torrent_list_page && downloaders.length > 0" block
             size="small"
             @click="download_free"
         >
@@ -925,7 +929,7 @@ onBeforeMount(async () => {
         <!--          复制链接-->
         <!--        </a-button>-->
         <a-button
-            v-if="torrent_detail_page" block
+            v-if="torrent_detail_page && downloaders.length > 0" block
             size="small"
             @click="download_to">
           <template #icon>
