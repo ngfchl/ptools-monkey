@@ -869,7 +869,7 @@ onBeforeMount(async () => {
           同步数据
         </a-button>
         <a-button
-            v-if="torrent_list_page && downloaders.length > 0" block
+            v-if="torrent_list_page && downloaders.length > 0  && mySiteId > 0" block
             size="small"
             @click="download_all"
         >
@@ -879,7 +879,7 @@ onBeforeMount(async () => {
           下载全部
         </a-button>
         <a-button
-            v-if="torrent_list_page && downloaders.length > 0" block
+            v-if="torrent_list_page && downloaders.length > 0  && mySiteId > 0" block
             size="small"
             @click="download_free"
         >
@@ -929,7 +929,7 @@ onBeforeMount(async () => {
         <!--          复制链接-->
         <!--        </a-button>-->
         <a-button
-            v-if="torrent_detail_page && downloaders.length > 0" block
+            v-if="torrent_detail_page && downloaders.length > 0  && mySiteId > 0" block
             size="small"
             @click="download_to">
           <template #icon>
@@ -938,7 +938,7 @@ onBeforeMount(async () => {
           下载到...
         </a-button>
         <a-button
-            v-if="torrent_detail_repeat" block
+            v-if="torrent_detail_repeat && mySiteId > 0" block
             size="small"
             @click="drawer = true">
           <template #icon>
