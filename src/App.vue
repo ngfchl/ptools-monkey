@@ -307,7 +307,7 @@ async function getSiteData() {
     message.error('用户ID获取失败！')
     return false
   }
-  let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}`
+  let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}&mirror=${document.location.origin}/`
   if (mySiteId.value != 0) {
     data += `&id=${mySiteId.value}`
   }
