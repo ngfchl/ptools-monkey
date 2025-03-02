@@ -189,7 +189,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-374d8825.js"(exports, module) {
+    "main-655d2f28.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -36879,7 +36879,7 @@ summary tabindex target title type usemap value width wmode wrap`;
               message.error("用户ID获取失败！");
               return false;
             }
-            let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie2}&user_agent=${user_agent}`;
+            let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie2}&user_agent=${user_agent}&mirror=${document.location.origin}/`;
             if (mySiteId.value != 0) {
               data += `&id=${mySiteId.value}`;
             }
