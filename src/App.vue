@@ -78,7 +78,7 @@ export interface Category {
 message.config({
   top: `50px`,
 });
-const activeKey = ref<number[]>([]);
+const activeKey = ref<number>();
 const downloaders = ref<Downloader[]>([])
 const user_detail_page = ref(false)
 const torrent_list_page = ref(false)
@@ -105,7 +105,8 @@ const showModal = () => {
   }
   open.value = true;
   let downloader_id = downloaders.value[0].id
-  activeKey.value.push(downloader_id)
+  console.log(activeKey.value)
+  activeKey.value = downloader_id
   getDownloaderCategorise(downloader_id)
 };
 const handleOk = (e: MouseEvent) => {
@@ -163,7 +164,7 @@ async function init_button() {
     if (downloaders.value.length <= 0) {
       await getDownloaders()
     }
-    await get_torrent_list()
+    await get_torrent_id_list()
     // await sync_torrents()
   }
   if (location.pathname.startsWith('/userdetails') ||
@@ -415,6 +416,41 @@ function xpath(query: string, node: Node) {
  * 抓取种子列表页
  */
 const torrents = ref<any>([])
+/**
+ * 提取链接中的 数字 id 信息
+ * @param s
+ */
+const extractId = (s: string) => {
+  const regexAll = /(?:t[-\/]|[?&]id=)(\d+)/;
+  return s.match(regexAll)?.[1]
+}
+
+async function get_torrent_id_list() {
+  torrents.value.length = 0
+  let torrent_list = xpath(siteInfo.value.torrents_rule.replace("]/tr", "]/tbody/tr"), document)
+  console.log('获取到种子数量：', torrent_list.snapshotLength)
+  for (let i = 0; i <= torrent_list.snapshotLength; i++) {
+    try {
+      let torrent_info = torrent_list.snapshotItem(i)
+      // 未获取到数据节点，pass
+      console.debug(torrent_info)
+      if (!torrent_info) continue
+      let detail_url = xpath(siteInfo.value.torrent_detail_url_rule, torrent_info).snapshotItem(0)
+      console.debug(detail_url)
+      if (!detail_url) continue
+      let tid = extractId(detail_url!.textContent!)!
+      let sale = xpath(siteInfo.value.torrent_sale_rule, torrent_info).snapshotItem(0)
+
+      torrents.value.push({
+        tid: tid,
+        sale_status: sale ? sale.textContent : '',
+      })
+    } catch (e) {
+      console.trace(e)
+    }
+  }
+  console.log('获取到种子信息：', torrents.value)
+}
 
 async function get_torrent_list() {
   torrents.value.length = 0
@@ -626,20 +662,16 @@ async function getDownloaderCategorise(downloader_id: number) {
  */
 const generate_magnet_url = async (flag: boolean) => {
   url_list.value.length = 0
-  if (torrents.value.length < 0) {
+  if (torrents.value.length <= 0) {
     return
   }
   console.log(flag)
   if (flag) {
     url_list.value = torrents.value.filter(
         (torrent: Torrent) => torrent.sale_status.toLowerCase().includes('free')
-    ).map(
-        (torrent: Torrent) => torrent.magnet_url.startsWith('https://') ? torrent.magnet_url : `${location.origin}/${torrent.magnet_url}`
-    )
+    ).map((torrent: Torrent) => torrent.tid)
   } else {
-    url_list.value = torrents.value.map(
-        (torrent: Torrent) => torrent.magnet_url.startsWith('https://') ? torrent.magnet_url : `${location.origin}/${torrent.magnet_url}`
-    )
+    url_list.value = torrents.value.map((torrent: Torrent) => torrent.tid)
   }
   console.log(url_list.value)
 }
@@ -655,17 +687,17 @@ const push_torrent = async (downloader_id: number, category: string | null, save
     return
   }
   GM_xmlhttpRequest({
-    url: `${api.value}api/option/push_torrent/${downloader_id}`,
+    url: `${api.value}api/option/push_monkey/${downloader_id}/${mySiteId.value}`,
     method: "POST",
     responseType: "json",
     headers: {
       Authorization: `Bearer Monkey.${token.value}`,
     },
     data: JSON.stringify({
-      cookie: document.cookie,
+      cookie: await getCookie(),
       category: category,
       save_path: save_path,
-      urls: url_list.value.join(','),
+      urls: url_list.value,
     }),
     onload: function (response) {
       let res = response.response
@@ -727,7 +759,7 @@ async function repeat(tid: number) {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Bearer Monkey.${token.value}`,
     },
-    data: `torrent_id=${tid}&site_id=${localStorage.getItem('mySite')}`,
+    data: `torrent_id=${tid}&site_id=${mySiteId.value}`,
     onload: function (response) {
       let res = response.response
       console.log(res)
@@ -759,7 +791,7 @@ async function download_all() {
   if (downloaders.value.length <= 0) {
     await getDownloaders()
   }
-  await get_torrent_list()
+  await get_torrent_id_list()
   await generate_magnet_url(false)
   // modal_title.value = `正在下载本页所有${url_list.value.length}条种子...`
   showModal()
@@ -769,7 +801,8 @@ async function download_free() {
   if (downloaders.value.length <= 0) {
     await getDownloaders()
   }
-  await get_torrent_list()
+  await get_torrent_id_list()
+  // await get_torrent_list()
   await generate_magnet_url(true)
   // modal_title.value = `正在下载本页${url_list.value.length}条免费种子...`
   showModal()
