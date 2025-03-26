@@ -169,7 +169,7 @@ export default defineConfig({
                     'https://ptlgs.org/*',
                     'https://pt.ghacg.com/*',
                     'https://hdbao.cc/*',
-                    'https://invites.fun/*',
+                    'https://www.invites.fun/*',
                     'https://www.52movie.top/*',
                     'https://lemonhd.club/*',
                     'https://pt.hdclone.org/*',
