@@ -680,7 +680,7 @@ const generate_magnet_url = async (flag: boolean) => {
  * 推送种子到下载器
  */
 const push_torrent = async (downloader_id: number, category: string | null, save_path: string | null) => {
-  await generate_magnet_url(false)
+  // await generate_magnet_url(false)
   console.log(url_list.value)
   if (url_list.value.length <= 0) {
     message.error('没有抓到种子链接！')
