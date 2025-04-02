@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import {GM_cookie, GM_getValue, GM_setValue, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
 import {message} from "ant-design-vue"
 import {
   ArrowDownOutlined,
   DownloadOutlined,
+  DragOutlined,
   PushpinFilled,
   SyncOutlined,
   ThunderboltOutlined,
@@ -93,7 +94,52 @@ const modal_title = ref<string>('下载到')
 const singleTorrent = ref<Torrent>()
 const mySiteId = ref<number>(0)
 const siteInfo = ref();
+const harvestWrap = ref<HTMLElement | null>(null);
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
 
+const onMouseDown = (e: MouseEvent) => {
+  if (!harvestWrap.value) return;
+  isDragging = true;
+  offsetX = e.clientX - harvestWrap.value.getBoundingClientRect().left;
+  offsetY = e.clientY - harvestWrap.value.getBoundingClientRect().top;
+  harvestWrap.value.style.cursor = "grabbing";
+};
+
+const onMouseMove = (e: MouseEvent) => {
+  if (!isDragging || !harvestWrap.value) return;
+  let x = e.clientX - offsetX;
+  let y = e.clientY - offsetY;
+  harvestWrap.value.style.left = `${x}px`;
+  harvestWrap.value.style.top = `${y}px`;
+};
+
+const onMouseUp = () => {
+  isDragging = false;
+  if (!harvestWrap.value) return;
+  if (harvestWrap.value) {
+    harvestWrap.value.style.cursor = "grab";
+  }
+  // 获取屏幕宽度和元素宽度
+  const screenWidth = window.innerWidth;
+  const elementWidth = harvestWrap.value?.offsetWidth;
+  const elementLeft = parseInt(harvestWrap.value.style.left, 10);
+
+  // 判断停靠位置
+  if (elementLeft > screenWidth / 2 - elementWidth / 2) {
+    // 靠右停放
+    harvestWrap.value.style.left = `${screenWidth - elementWidth}px`;
+  } else {
+    // 靠左停放
+    harvestWrap.value!.style.left = "0px";
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+});
 const showModal = () => {
   if (downloaders.value.length <= 0) {
     message.warning('没有可用的下载器！请先在收割机中添加！')
@@ -845,6 +891,7 @@ const handleSaveServer = () => {
   location.reload()
 }
 const init = ref(0)
+
 onBeforeMount(async () => {
   try {
     // 最顶层才加载
@@ -865,18 +912,22 @@ onBeforeMount(async () => {
     }
   } catch (error) {
     console.error('Error in beforeMount:', error);
+    console.trace(error)
   }
 })
 
 </script>
 
 <template>
-  <div class="harvest-wrap">
-    <a-image
-        :preview="false"
-        class="image"
-        fallback="https://picsum.photos/200/200/?random"
-        src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E5%B0%91%E5%A5%B3%E5%86%99%E7%9C%9F5"/>
+  <div ref="harvestWrap" class="harvest-wrap">
+    <div style="position:relative;">
+      <a-image
+          :preview="false"
+          class="image"
+          fallback="https://picsum.photos/200/200/?random"
+          src="https://api.r10086.com/%E6%A8%B1%E9%81%93%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87api%E6%8E%A5%E5%8F%A3.php?%E5%9B%BE%E7%89%87%E7%B3%BB%E5%88%97=%E5%B0%91%E5%A5%B3%E5%86%99%E7%9C%9F5"/>
+      <DragOutlined class="move-item" @mousedown="onMouseDown"/>
+    </div>
     <a-space
         align="center"
         style="width: 100%;"
