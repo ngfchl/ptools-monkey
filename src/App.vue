@@ -68,6 +68,7 @@ export interface Downloader {
   http?: 'http' | 'https'
   host?: string
   port?: number
+  sort_id?: number
   category: string
 }
 
@@ -646,6 +647,7 @@ async function getDownloaders() {
       } else {
         console.log('下载器列表获取成功！', res)
         downloaders.value = res.data
+        downloaders.value.sort((a, b) => (a.sort_id ?? 0) - (b.sort_id ?? 0))
       }
     }
   })
