@@ -571,7 +571,7 @@ async function get_torrent_list() {
         sale_status: sale ? sale.textContent : '',
         seeders: seeders ? seeders.textContent : 0,
         poster: poster ? poster.textContent : '',
-        tags: tags.snapshotLength > 0 ? tag.join() : '',
+        tags: [tags.snapshotLength > 0 ? tag.join() : '', siteInfo.value.name].filter(item => item.length > 0),
         tid: tid,
         site_id: siteInfo.value.name,
       }
@@ -624,7 +624,7 @@ async function get_torrent_detail() {
     files_count: files_count ? files_count.textContent!.match(/\d+/g)![0] : null,
     hash_string: hash_string ? hash_string.textContent!.trim().match(/[0-9a-f]{40}/)![0] : '',
     poster: poster ? poster.textContent!.trim() : '',
-    tags: tags.snapshotLength > 0 ? tag.join() : '',
+    tags: [tags.snapshotLength > 0 ? tag.join() : '', siteInfo.value.name].filter(item => item.length > 0),
     imdb_url: imdb ? imdb.textContent!.trim() : '',
   }
   torrents.value.push(torrent)
@@ -734,6 +734,14 @@ const push_torrent = async (downloader_id: number, category: string | null, save
     message.error('没有抓到种子链接！')
     return
   }
+  const data = JSON.stringify({
+    cookie: await getCookie(),
+    category: category,
+    save_path: save_path,
+    urls: url_list.value,
+    tags: [siteInfo.value.name, "harvest-monkey"],
+  })
+  console.log(data)
   GM_xmlhttpRequest({
     url: `${api.value}api/option/push_monkey/${downloader_id}/${mySiteId.value}`,
     method: "POST",
@@ -741,12 +749,7 @@ const push_torrent = async (downloader_id: number, category: string | null, save
     headers: {
       Authorization: `Bearer Monkey.${token.value}`,
     },
-    data: JSON.stringify({
-      cookie: await getCookie(),
-      category: category,
-      save_path: save_path,
-      urls: url_list.value,
-    }),
+    data: data,
     onload: function (response) {
       let res = response.response
       console.log(res)
