@@ -227,7 +227,7 @@ async function init_button() {
     console.log('当前为个人信息页')
     await sync_cookie()
   }
-  if (location.pathname.search(/usercp.php/) > 0 ||
+  if ((location.pathname.search(/usercp.php/) > 0 && !location.href.includes('?')) ||
       location.href.includes('p_user/edit_passkey') ||
       location.href.includes('/index.php?page=usercp&do=pid_c&action=change&uid=') ||
       location.href.includes('/Users/me') ||
@@ -344,7 +344,7 @@ async function getSiteData() {
     console.log('获取 UID 出错啦！')
     return false
   }
-  if (!location.href.endsWith(href)) {
+  if (location.href.includes('?id=') && !location.href.endsWith(href)) {
     console.log('非本人主页，取消同步！')
     return false
   }
