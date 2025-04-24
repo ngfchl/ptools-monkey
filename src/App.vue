@@ -339,8 +339,13 @@ async function getSiteData() {
   //获取UID
   let href = document.evaluate(siteInfo.value.my_uid_rule, document).iterateNext()!.textContent
   console.log(href)
+
   if (!href) {
     console.log('获取 UID 出错啦！')
+    return false
+  }
+  if (!location.href.endsWith(href)) {
+    console.log('非本人主页，取消同步！')
     return false
   }
   let user_id_info;
