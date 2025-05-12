@@ -348,13 +348,15 @@ async function getSiteData() {
     console.log('非本人主页，取消同步！')
     return false
   }
-  let user_id_info;
+  let user_id;
   if (href.includes("=")) {
-    user_id_info = href.split('=')
+    let url = new URL(href)
+    user_id = url.searchParams.get("id") ?? url.searchParams.get("uid") ?? url.searchParams.get("user_id")
   } else {
-    user_id_info = href.split('/')
+    let user_id_info = href.split('/')
+    user_id = user_id_info[user_id_info.length - 1].trim()
   }
-  let user_id = user_id_info[user_id_info.length - 1].trim()
+
   console.log(user_id)
   if (!user_id) {
     message.error('用户ID获取失败！')
