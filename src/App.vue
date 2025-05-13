@@ -350,6 +350,10 @@ async function getSiteData() {
   }
   let user_id;
   if (href.includes("=")) {
+    if (!href.startsWith('http')) {
+      href = `${location.origin}/${href}`
+    }
+
     let url = new URL(href)
     user_id = url.searchParams.get("id") ?? url.searchParams.get("uid") ?? url.searchParams.get("user_id")
   } else {
