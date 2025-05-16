@@ -697,7 +697,7 @@ async function getDownloaderCategorise(downloader_id: number) {
   }
   await test_connect(downloader_id)
   GM_xmlhttpRequest({
-    url: `${api.value}api/option/downloaders/categories/${downloader_id}`,
+    url: `${api.value}api/option/downloaders/category/${downloader_id}`,
     method: "GET",
     responseType: "json",
     headers: {
