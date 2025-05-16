@@ -980,9 +980,20 @@ onBeforeMount(async () => {
           收割机
         </a-button>
         <a-button
+            v-if="user_detail_page && mySiteId == 0"
             block size="small"
             type="primary"
-            @click="mySiteId == 0 ? go_to_control_page : sync_cookie">
+            @click="go_to_control_page">
+          <template #icon>
+            <SyncOutlined/>
+          </template>
+          同步数据
+        </a-button>
+        <a-button
+            v-else
+            block size="small"
+            type="primary"
+            @click="sync_cookie">
           <template #icon>
             <SyncOutlined/>
           </template>
