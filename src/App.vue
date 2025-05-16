@@ -171,7 +171,7 @@ async function init_button() {
   } else {
     user_detail_page.value = true
   }
-
+// if (location.pathname.includes(siteInfo.value.page_detail) //尝试与配置文件中的信息绑定
   if (location.pathname.startsWith('/details.php')
       || location.pathname.includes('/torrent.php')
       || location.pathname.includes('/views.php')
@@ -197,7 +197,7 @@ async function init_button() {
     await repeat(tid)
 
   }
-
+// if (location.pathname.includes(siteInfo.value.page_torrents) //尝试与配置文件中的信息绑定
   if (location.pathname.search(/torrents\D*$/) > 0 ||
       location.pathname.search(/t$/) > 0 ||
       location.pathname.endsWith('/Torrents') ||
@@ -214,6 +214,7 @@ async function init_button() {
     await get_torrent_id_list()
     // await sync_torrents()
   }
+  // if (location.pathname.includes(siteInfo.value.page_user) //尝试与配置文件中的信息绑定
   if (location.pathname.startsWith('/userdetails') ||
       location.href.includes('/user.php?id=') ||
       location.href.includes('/p_user/user_detail.php') ||
@@ -227,6 +228,8 @@ async function init_button() {
     console.log('当前为个人信息页')
     await sync_cookie()
   }
+
+  // if (location.pathname.includes(siteInfo.value.page_control_panel) //尝试与配置文件中的信息绑定
   if ((location.pathname.search(/usercp.php/) > 0 && !location.href.includes('?')) ||
       location.href.includes('p_user/edit_passkey') ||
       location.href.includes('/index.php?page=usercp&do=pid_c&action=change&uid=') ||
@@ -439,6 +442,14 @@ async function sync_cookie() {
       return res
     })
   }
+}
+
+/**
+ * 跳转控制面板页面并同步 Cookie
+ */
+async function go_to_control_page() {
+  let url = siteInfo.value.page_control_panel
+  location.replace(url);
 }
 
 /**
@@ -969,9 +980,9 @@ onBeforeMount(async () => {
           收割机
         </a-button>
         <a-button
-            v-if="user_detail_page" block size="small"
+            block size="small"
             type="primary"
-            @click="sync_cookie">
+            @click="mySiteId == 0 ? go_to_control_page : sync_cookie">
           <template #icon>
             <SyncOutlined/>
           </template>
