@@ -276,9 +276,9 @@ const getSite = async (): Promise<boolean | null> => {
           console.log(res.msg)
           resolve(true)
         } else {
-          let msg = `${res.msg}请检查油猴 Token 是否填写正确！如未配置，请在 APP 端 => 系统设置中生成并添加油猴Token，并填加到油猴中！`;
+          let msg = `获取站点信息出错：${res.msg}`;
           console.warn(msg)
-          message.warning(msg, 100000)
+          message.warning(msg, 10000)
           resolve(false)
           return
         }
@@ -448,6 +448,11 @@ async function sync_cookie() {
  * 跳转控制面板页面并同步 Cookie
  */
 async function go_to_control_page() {
+  console.log('跳转控制面板页面...')
+  console.log(siteInfo.value)
+  if (!(siteInfo.value)) {
+    await getSite()
+  }
   let url = siteInfo.value.page_control_panel
   location.replace(url);
 }
@@ -979,21 +984,20 @@ onBeforeMount(async () => {
           </template>
           收割机
         </a-button>
+        <!--        <a-button-->
+        <!--            v-if="user_detail_page && mySiteId == 0"-->
+        <!--            block size="small"-->
+        <!--            type="primary"-->
+        <!--            @click="go_to_control_page">-->
+        <!--          <template #icon>-->
+        <!--            <SyncOutlined/>-->
+        <!--          </template>-->
+        <!--          同步数据-->
+        <!--        </a-button>-->
         <a-button
-            v-if="user_detail_page && mySiteId == 0"
             block size="small"
             type="primary"
             @click="go_to_control_page">
-          <template #icon>
-            <SyncOutlined/>
-          </template>
-          同步数据
-        </a-button>
-        <a-button
-            v-else
-            block size="small"
-            type="primary"
-            @click="sync_cookie">
           <template #icon>
             <SyncOutlined/>
           </template>
