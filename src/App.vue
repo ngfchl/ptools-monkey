@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {onBeforeMount, onMounted, ref} from "vue";
-import {GM_cookie, GM_getValue, GM_setValue, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
+import {GM_cookie, GM_getValue, GM_info, GM_setValue, GM_xmlhttpRequest} from 'vite-plugin-monkey/dist/client'
 import {message} from "ant-design-vue"
 import {
   ArrowDownOutlined,
@@ -376,14 +376,14 @@ async function getSiteData() {
     host = host.replace("xp.", "api.")
     host = host.replace("kp.", "api.")
   }
-  let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}&mirror=${host}/`
+  let data = `user_id=${user_id}&site=${siteInfo.value.name}&cookie=${cookie}&user_agent=${user_agent}`
   /* 处理馒头域名结束 */
 
   if (mySiteId.value != 0) {
     data += `&id=${mySiteId.value}`
   }
   if (mySiteId.value == 0) {
-    data += `&nickname=${siteInfo.value.name}`
+    data += `&nickname=${siteInfo.value.name}&mirror=${host}/`
   }
   let passkey = getPasskey()
   if (passkey != false) {
@@ -935,6 +935,17 @@ const init = ref(0)
 
 onBeforeMount(async () => {
   try {
+    console.log(GM_info)
+    const isTampermonkeyBeta = GM_info.version > '5.0.0';
+
+    if (isTampermonkeyBeta) {
+      console.log('当前是 Tampermonkey Beta 版本');
+    } else {
+      console.log('当前是 Tampermonkey 稳定版');
+      message.error('请在篡改猴测试版中使用收割机脚本！');
+      return;
+    }
+
     // 最顶层才加载
     if (window.top != window.self || !checkServer()) return;
     let checkAuth;
