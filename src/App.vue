@@ -234,6 +234,7 @@ async function init_button() {
       location.href.includes('p_user/edit_passkey') ||
       location.href.includes('/index.php?page=usercp&do=pid_c&action=change&uid=') ||
       location.href.includes('/Users/me') ||
+      location.href.includes('/user/setting') ||
       location.href.includes('/my.php')
   ) {
     console.log('当前为控制面板页')
