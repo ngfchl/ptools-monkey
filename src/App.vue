@@ -359,7 +359,7 @@ async function getSiteData() {
     }
 
     let url = new URL(href)
-    user_id = url.searchParams.get("id") ?? url.searchParams.get("uid") ?? url.searchParams.get("user_id")
+    user_id = url.searchParams.get("id") ?? url.searchParams.get("uid") ?? url.searchParams.get("user_id") ?? url.searchParams.get("uuid")
   } else {
     let user_id_info = href.split('/')
     user_id = user_id_info[user_id_info.length - 1].trim()
