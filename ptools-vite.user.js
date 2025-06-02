@@ -202,7 +202,7 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var require_main_001 = __commonJS({
-    "main-f6d7d801.js"(exports, module) {
+    "main-5920bd17.js"(exports, module) {
       function _typeof$1(o2) {
         "@babel/helpers - typeof";
         return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -36987,7 +36987,7 @@ summary tabindex target title type usemap value width wmode wrap`;
               data += `&id=${mySiteId.value}`;
             }
             if (mySiteId.value == 0) {
-              data += `&nickname=${siteInfo.value.name}&mirror=${host}/`;
+              data += `&nickname=${siteInfo.value.name}&mirror=${host}`;
             }
             let passkey = getPasskey();
             if (passkey != false) {
