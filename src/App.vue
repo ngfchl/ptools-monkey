@@ -384,7 +384,7 @@ async function getSiteData() {
     data += `&id=${mySiteId.value}`
   }
   if (mySiteId.value == 0) {
-    data += `&nickname=${siteInfo.value.name}&mirror=${host}/`
+    data += `&nickname=${siteInfo.value.name}&mirror=${host}`
   }
   let passkey = getPasskey()
   if (passkey != false) {
