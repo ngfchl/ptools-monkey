@@ -396,6 +396,16 @@ async function getSiteData() {
   if (time_join != false) {
     data += `&time_join=${time_join}`
   }
+  let username = getUsername()
+  console.log(username)
+  if (username != false) {
+    data += `&username=${username}`
+  }
+  let email = getEmail()
+  console.log(email)
+  if (email != false) {
+    data += `&email=${email}`
+  }
   return data
 }
 
@@ -421,6 +431,55 @@ const getTimeJoin = () => {
         .replace('T', ' ')
         .replace('+08:00', '')
         .match(/\d{4}\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/)![0]
+  } catch (e) {
+    console.error(e)
+    return false
+  }
+}
+/**
+ * 获取用户名
+ */
+const getUsername = () => {
+  try {
+    let username = document.evaluate(siteInfo.value.my_username_rule, document).iterateNext()!.textContent
+    return username!.trim()
+  } catch (e) {
+    console.error(e)
+    return false
+  }
+}
+
+/**
+ * 提取邮箱方法
+ */
+function extractFirstEmail(text: string) {
+  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  const match = text.match(emailRegex);
+  return match ? match[0] : null;
+}
+
+/**
+ * 邮箱验证方法
+ */
+function validateEmail(email: string) {
+  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * 获取邮箱地址
+ */
+const getEmail = () => {
+  try {
+    let emailString = document.evaluate(siteInfo.value.my_email_rule, document).iterateNext()!.textContent
+    if (!emailString) {
+      return false
+    }
+    let email = extractFirstEmail(emailString)
+    if (!email || !validateEmail(email)) {
+      return false
+    }
+    return email
   } catch (e) {
     console.error(e)
     return false
